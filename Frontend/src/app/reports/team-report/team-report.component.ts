@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Employee, EmployeesService } from '../../Services/Employees-serives/employees.service';
+import { AuthService } from 'src/app/Services/Auth-services/auth.service';
 
 @Component({
   selector: 'app-team-report',
@@ -7,7 +8,7 @@ import { Employee, EmployeesService } from '../../Services/Employees-serives/emp
   styleUrls: ['./team-report.component.scss']
 })
 export class TeamReportComponent implements OnInit {
-      backendUrl = 'http://localhost:3000'; 
+  backendUrl = 'http://localhost:3000';
   employees: Employee[] = [];
   filteredEmployees: Employee[] = [];
 
@@ -17,22 +18,31 @@ export class TeamReportComponent implements OnInit {
   filter = { from: '', to: '' };
   searchText: string = '';
 
+   user: any;           // Logged-in user
+  canViewReport = false; // Permission flag
+
   // Reports tabs
   reports = [
     { key: 'team', label: 'Team Report', link: '/reports/team-report' },
+    { key: 'attendance', label: 'Attendance Report', link: '/reports/attendance-report' },
     { key: 'leave', label: 'Leave Report', link: '/reports/leave-report' },
     { key: 'payroll', label: 'Payroll Report', link: '/reports/payroll-report' },
     { key: 'contact', label: 'Contact Report', link: '/reports/contact-report' },
-    { key: 'security', label: 'Security Report', link: '/reports/security-report' },
-    { key: 'wfh', label: 'Work From Home Report', link: '/reports/work-from-home-report' }
+
   ];
 
-  constructor(private employeesService: EmployeesService) {}
+  constructor(private employeesService: EmployeesService,
+    private authService: AuthService
+  ) { }
 
-  ngOnInit(): void {
-    this.loadEmployees();
-  }
+ngOnInit(): void {
+  // Subscribe to reactive permissions
+  this.authService.permissions$.subscribe(perm => {
+    this.canViewReport = this.authService.hasPermission('can_report_action');
+  });
 
+  this.loadEmployees();
+}
   loadEmployees(): void {
     this.employeesService.getEmployees().subscribe({
       next: (data) => {
@@ -78,8 +88,8 @@ export class TeamReportComponent implements OnInit {
     if (!status) return '';
     status = status.toLowerCase();
     return status === 'active' ? 'bg-success' :
-           status === 'inactive' ? 'bg-warning text-dark' :
-           status === 'on_leave' ? 'bg-info text-dark' : '';
+      status === 'inactive' ? 'bg-warning text-dark' :
+        status === 'on_leave' ? 'bg-info text-dark' : '';
   }
 
   // ---------------- CSV Export ----------------
@@ -112,11 +122,11 @@ export class TeamReportComponent implements OnInit {
   }
 
   getEmployeeImage(emp: any): string {
-  return emp.image ? `${this.backendUrl}${emp.image}` : 'assets/default-user.png';
-}
+    return emp.image ? `${this.backendUrl}${emp.image}` : 'assets/default-user.png';
+  }
 
-onImageError(event: any) {
-  event.target.src = 'assets/default-user.png';
-}
+  onImageError(event: any) {
+    event.target.src = 'assets/default-user.png';
+  }
 
 }

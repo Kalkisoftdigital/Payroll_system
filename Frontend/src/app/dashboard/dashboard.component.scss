@@ -1,0 +1,166 @@
+/* Main Wrapper */
+.main-wrapper {
+  background-color: #f5f7fa;
+  min-height: 100vh;
+
+  .page-wrapper {
+    padding: 1.5rem 2rem;
+
+    .card {
+      border-radius: 0.75rem;
+      transition: all 0.3s ease;
+      background-color: #fff;
+
+      &.shadow-sm {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.08);
+      }
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      }
+
+      .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid #e9ecef;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .card-body {
+        padding: 1rem 1rem;
+      }
+    }
+
+    /* KPI Cards */
+    .flex-fill {
+      cursor: pointer;
+      background-color: #fdfeff; /* Light Sky Blue */
+      border: 1px solid #eceef0;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #cfd6df;
+      }
+
+      .kpi-icon {
+        font-size: 2.2rem;
+        color: #0d6efd;
+        margin: 10px auto 5px auto;
+        display: block;
+      }
+
+      h6 {
+        font-size: 0.9rem;
+        color: #0d6efd;
+        margin-bottom: 0.25rem;
+        text-align: center;
+      }
+
+      h4 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0d3b66;
+        text-align: center;
+      }
+
+      /* Subcards inside KPI cards */
+      .card {
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        text-align: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+
+        &.ripple::after {
+          content: "";
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          pointer-events: none;
+          background-image: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 10.01%);
+          background-repeat: no-repeat;
+          background-position: 50%;
+          transform: scale(10,10);
+          opacity: 0;
+          transition: transform 0.5s, opacity 1s;
+        }
+
+        &.ripple:active::after {
+          transform: scale(0,0);
+          opacity: 0.2;
+          transition: 0s;
+        }
+
+        .subcard-icon {
+          font-size: 1rem;
+          color: #ffffffcc;
+          display: block;
+          margin: 5px auto 2px auto;
+        }
+      }
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+
+      th, td {
+        vertical-align: middle;
+        padding: 0.75rem 0.5rem;
+      }
+
+      tbody tr {
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: rgba(0, 123, 255, 0.05);
+        }
+      }
+
+      th {
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+      }
+
+      td {
+        color: #495057;
+        border-bottom: 1px solid #dee2e6;
+      }
+    }
+
+    /* Search input */
+    input.form-control {
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      padding: 0.25rem 0.5rem;
+      width: auto;
+    }
+
+    /* Charts */
+    apx-chart {
+      min-height: 300px;
+    }
+  }
+}
+
+/* Leaves status color coding */
+.text-success { color: #e1e9e3 !important; font-weight: 600; }
+.text-warning { color: #ffc107 !important; font-weight: 600; }
+.text-danger  { color: #dc3545 !important; font-weight: 600; }
+
+/* Trend arrows for KPI cards */
+.bi-arrow-up   { color: #28a745; font-size: 0.85rem; }
+.bi-arrow-down { color: #dc3545; font-size: 0.85rem; }

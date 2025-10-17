@@ -1,56 +1,39 @@
 <app-nav-bar></app-nav-bar>
+<div class="main-wrapper mt-5">
 <div class="page-wrapper">
-
-    <!-- Start Content -->
     <div class="content">
-
-        <!-- Page Header -->
         <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
             <div class="flex-grow-1">
-                <h5 class="fw-bold">Leaves</h5>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb breadcrumb-divide p-0 mb-0">
-                        <li class="breadcrumb-item d-flex align-items-center"><a href="dashboard"><i
-                                    class="ti ti-home me-1"></i>Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Leaves</li>
-                    </ol>
-                </nav>
+                <h5 class="fw-bold">Leave Types</h5>
             </div>
             <div>
-                <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#add_modal"><i class="ti ti-circle-plus me-1"></i>New Leave Type</a>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_modal">
+                    <i class="ti ti-circle-plus me-1"></i>New Leave Type
+                </button>
             </div>
         </div>
-        <!-- End Page Header -->
 
-        <div class="d-flex align-items-center mb-3">
-            <a href="leaves" class="btn btn-sm btn-light border fs-14 me-2">All Leaves</a>
-            <a href="leave-types" class="btn btn-sm btn-dark fs-14">Leave Types</a>
-        </div>
 
         <div class="table-responsive">
             <table class="table table-nowrap border">
                 <thead class="thead-light">
                     <tr>
                         <th>Leave Type</th>
-                        <th>Created On</th>
                         <th>Status</th>
+                        <th>Created On</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let leave of leaveTypes">
                         <td>{{ leave.name }}</td>
-                        <td>{{ leave.created_at | date }}</td>
-                        <td>{{ leave.status || 'Active' }}</td>
+                        <td>{{ leave.status }}</td>
+                        <td>{{ leave.created_at | date:'short' }}</td>
+
                         <td class="d-flex gap-2">
-                            <button class="btn btn-sm btn-primary" (click)="openEditModal(leave, editModal)">
-                                Edit
-                            </button>
-                            <button class="btn btn-sm btn-danger"
-                                (click)="openDeleteModal(leave.id!, deleteModal)">
-                                Delete
-                            </button>
+                            <button class="btn btn-sm btn-primary"
+                                (click)="openEditModal(leave, editModal)">Edit</button>
+                            <button class="btn btn-sm btn-danger" (click)="openDeleteModal(leave)">Delete</button>
                         </td>
                     </tr>
                     <tr *ngIf="leaveTypes.length === 0">
@@ -59,11 +42,10 @@
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
 
-<!-- Add Leave Modal -->
+<!-- Add Modal -->
 <div class="modal fade" id="add_modal" #addModal tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -85,12 +67,12 @@
     </div>
 </div>
 
-<!-- Edit Leave Modal -->
+<!-- Edit Modal -->
 <div class="modal fade" id="edit_modal" #editModal tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 class="fw-bold mb-0">Edit Leave</h6>
+                <h6 class="fw-bold mb-0">Edit Leave Type</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form [formGroup]="editForm" (ngSubmit)="saveEdit(editModal)">
@@ -109,16 +91,17 @@
 
 <!-- Delete Modal -->
 <div class="modal fade" #deleteModal tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content">
-      <div class="modal-body text-center">
-        <h6 class="mb-1">Delete Confirmation</h6>
-        <p class="mb-3">Are you sure want to delete this leave type?</p>
-        <div class="d-flex justify-content-center gap-2">
-          <button type="button" class="btn btn-light w-50" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger w-50" (click)="confirmDelete(deleteModal)">Yes, Delete</button>
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <h6 class="mb-1">Delete Confirmation</h6>
+                <p class="mb-3">Are you sure you want to delete this leave type?</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-light w-50" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger w-50" (click)="confirmDelete()">Yes, Delete</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 </div>

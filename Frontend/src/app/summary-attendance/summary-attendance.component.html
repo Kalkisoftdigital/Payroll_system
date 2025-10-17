@@ -1,0 +1,82 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="main-wrapper mt-5">
+    <div class="page-wrapper">
+        <div class="content">
+
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <button class="btn btn-outline-dark" routerLink="/attendance">Attendance</button>
+                <button class="btn btn-outline-dark" routerLink="/attendance/summary-attendance">Summary
+                    Attendance</button>
+            </div>
+
+            <div class="row g-2">
+                <h5>Summary Attendance (All Employees)</h5>
+                <table class="table table-hover text-center align-middle shadow-sm rounded-3">
+                    <thead class="table-black text-white style = font-size: 1rem;">
+                        <tr>
+                            <th style="color: #FFD700;">Employee</th>
+                            <th style="color: #00FFFF;">Total Days</th>
+                            <th style="color: #FF6347;">Absent</th>
+                            <th style="color: #FFA500;">Half Days</th>
+                            <th style="color: #DC143C;">LOP</th>
+                            <th style="color: #32CD32;">Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let emp of summaryData" class="table-row-hover" style="font-size: 1.05rem;">
+                            <td class="fw-semibold text-primary">{{ emp.empName }}</td>
+                            <td class="text-info" style="font-size: 1.05rem;">{{ emp.totalDays }}</td>
+                            <td>
+                                <span class="badge text-danger" style="font-size: 1rem;">{{ emp.absent }}</span>
+                            </td>
+                            <td>
+                                <span class="badge text-warning" style="font-size: 1rem;">
+                                    {{ displayFraction(emp.half) }}
+                                </span>
+                            </td>
+
+                            <!-- LOP -->
+                            <td>
+                                <span class="badge text-danger" style="font-size: 1rem;">
+                                    {{ displayFraction(emp.lop) }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="badge text-success" style="font-size: 1rem;">
+                                    {{ displayFraction(emp.paid) }}
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr *ngIf="summaryData.length === 0">
+                            <td colspan="6" class="text-center text-muted py-3">No attendance records found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <style>
+                    /* Hover effect for rows */
+                    .table-row-hover:hover {
+                        background-color: #f1f5f9;
+                        transition: 0.2s;
+                    }
+
+                    /* Custom light red badge for LOP */
+                    .badge.bg-danger-light {
+                        background-color: #f8d7da;
+                    }
+
+                    /* Rounded table edges */
+                    table.table-hover {
+                        border-radius: 0.5rem;
+                        overflow: hidden;
+                    }
+                </style>
+
+            </div>
+
+        </div>
+    </div>
+</div>

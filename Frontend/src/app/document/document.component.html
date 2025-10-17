@@ -1,0 +1,187 @@
+<app-nav-bar></app-nav-bar>
+<div class="main-wrapper mt-5 ">
+    <div class="page-wrapper">
+        <!-- Start Content -->
+        <div class="content">
+            <!-- start row -->
+            <div class="row">
+                <div class="col-lg-10">
+                    <div>
+                        <h6 class="mb-3 fs-14">
+                            <a routerLink="/employees">
+                                <i class="ti ti-arrow-left me-1"></i>Employees
+                            </a>
+                        </h6>
+                    </div>
+
+                    <!-- Documents Tab -->
+                    <div class="tab-pane show active" id="nav_tab_3" role="tabpanel">
+                        <div class="card rounded-0 mb-0">
+                            <div class="card-header d-flex align-items-center justify-content-between">
+                                <h6 class="fw-bold mb-0">Documents</h6>
+                                <a href="javascript:void(0);" class="btn btn-primary fs-12 py-1" data-bs-toggle="modal"
+                                    data-bs-target="#add_document">
+                                    <i class="ti ti-circle-plus me-1"></i>New Document
+                                </a>
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="table-responsive">
+                                    <table class="table table-nowrap border">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Date</th>
+                                                <th>Size</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let doc of documents">
+                                                <td><a [href]="doc.filePath" target="_blank">{{ doc.name }}</a></td>
+                                                <td>{{ doc.type }}</td>
+                                                <td>{{ doc.date | date:'shortDate' }}</td>
+                                                <td>{{ doc.size }}</td>
+                                                <td>
+                                                    <div class="d-inline-flex align-items-center">
+                                                        <a href="javascript:void(0);"
+                                                            (click)="openEditDocumentModal(doc)"><i
+                                                                class="ti ti-edit"></i></a>
+                                                        <a href="javascript:void(0);" (click)="deleteDocument(doc)"><i
+                                                                class="ti ti-trash"></i></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="documents.length === 0">
+                                                <td colspan="5" class="text-center text-muted">No documents found</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Document Modal -->
+                    <div class="modal fade" id="add_document" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div class="page-title">
+
+                                        <h6 class="fw-bold mb-0">Add New Document</h6>
+                                    </div>
+                                    <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close">
+                                        <i class="ti ti-x"></i>
+                                    </button>
+                                </div>
+
+                                <form (ngSubmit)="uploadDocument()" #documentForm="ngForm">
+                                    <div class="modal-body">
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Select Employee <span
+                                                    class="text-danger">*</span></label>
+
+                                            <!-- Normal user: readonly input -->
+                                            <ng-container *ngIf="!canActOnOthers; else showDropdown">
+                                                <input type="text" class="form-control"
+                                                    [value]="getEmployeeName(user.employee_id)" readonly />
+                                                <input type="hidden" [(ngModel)]="selectedEmployeeId" name="employeeId"
+                                                    [value]="user.employee_id" />
+                                            </ng-container>
+
+                                            <!-- Admin / HR: show dropdown -->
+                                            <ng-template #showDropdown>
+                                                <select class="form-control" [(ngModel)]="selectedEmployeeId"
+                                                    name="employeeId" required>
+                                                    <option value="" disabled selected>-- Select Employee --</option>
+                                                    <option *ngFor="let emp of employees" [value]="emp.id">
+                                                        {{ emp.firstname }} {{ emp.lastName }}
+                                                    </option>
+                                                </select>
+                                            </ng-template>
+                                        </div>
+
+
+
+                                        <!-- Document Name -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Document Name <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" required
+                                                [(ngModel)]="newDocument.name" name="name" />
+                                        </div>
+
+                                        <!-- File Upload -->
+                                        <div>
+                                            <label class="form-label">Upload Document <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="file" class="form-control" (change)="onFileSelected($event)" />
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <div class="d-flex align-items-center justify-content-end">
+                                            <button type="button" class="btn me-2 btn-light"
+                                                data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary"
+                                                [disabled]="!selectedFile || !selectedEmployeeId">
+                                                Add Document
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Document Modal -->
+                    <div class="modal fade" id="edit_document" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div class="page-title">
+                                        <h6 class="fw-bold mb-0">Edit Document</h6>
+                                    </div>
+                                    <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close">
+                                        <i class="ti ti-x"></i>
+                                    </button>
+                                </div>
+
+                                <form (ngSubmit)="updateDocument()" [formGroup]="editDocumentForm">
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Document Name <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" formControlName="name" required />
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Upload Document <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="file" class="form-control"
+                                                (change)="onEditFileSelected($event)" />
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <div class="d-flex align-items-center justify-content-end">
+                                            <button type="button" class="btn me-2 btn-light"
+                                                data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

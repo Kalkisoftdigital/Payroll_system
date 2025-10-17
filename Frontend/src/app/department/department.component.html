@@ -1,7 +1,7 @@
 <app-nav-bar></app-nav-bar>
 
 <!-- Begin Wrapper -->
-<div class="main-wrapper">
+<div class="main-wrapper mt-5">
   <div class="page-wrapper">
     <div class="content">
 
@@ -11,9 +11,10 @@
           <h5 class="fw-bold">Department</h5>
         </div>
         <div>
-          <a routerLink="/add-department" class="btn btn-primary">
-            <i class="ti ti-circle-plus me-1"></i> New Department
+          <a [routerLink]="['/add-department']" class="btn btn-primary" [class.disabled]="!canDepartmentAction">
+            <i class="ti ti-circle-plus me-1"></i>New Department
           </a>
+
         </div>
       </div>
       <!-- End Page Header -->
@@ -41,13 +42,15 @@
               </td>
               <td>
                 <div class="d-flex align-items-center">
-                  <a class="btn btn-sm btn-primary me-2" [routerLink]="['/add-department', dept.id]">
-                    <i class="ti ti-pencil"></i> Edit
+                  <a class="btn btn-sm btn-primary" [routerLink]="['/add-department', dept.id]"
+                    [class.disabled]="!canDepartmentAction">
+                    Edit
                   </a>
                   <button class="btn btn-sm btn-danger" (click)="confirmDelete(dept.id!)"
-                    data-bs-toggle="modal" data-bs-target="#delete_modal">
+                    [class.disabled]="!canDepartmentAction" data-bs-toggle="modal" data-bs-target="#delete_modal">
                     <i class="ti ti-trash"></i> Delete
                   </button>
+
                 </div>
               </td>
             </tr>

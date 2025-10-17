@@ -9,23 +9,23 @@ import { Leave } from '../../models/leave.model';
   styleUrls: ['./leave-report.component.scss']
 })
 export class LeaveReportComponent implements OnInit {
-      backendUrl = 'http://localhost:3000'; 
+  backendUrl = 'http://localhost:3000';
   totalLeaves: number = 12; // Total leaves allowed per year
   leaves: Leave[] = [];
   filteredLeaves: Leave[] = [];
   employees: any[] = [];
   filter = { from: '', to: '' };
   searchText: string = '';
-   employeeMap: { [id: number]: Employee } = {};
+  employeeMap: { [id: number]: Employee } = {};
 
   // Reports tabs for buttons
   reports = [
     { key: 'team', label: 'Team Report', link: '/reports/team-report' },
+    { key: 'attendance', label: 'Attendance Report', link: '/reports/attendance-report' },
     { key: 'leave', label: 'Leave Report', link: '/reports/leave-report' },
     { key: 'payroll', label: 'Payroll Report', link: '/reports/payroll-report' },
     { key: 'contact', label: 'Contact Report', link: '/reports/contact-report' },
-    { key: 'security', label: 'Security Report', link: '/reports/security-report' },
-    { key: 'wfh', label: 'Work From Home Report', link: '/reports/work-from-home-report' }
+
   ];
 
   activeReport: string = 'leave'; // Default active tab
@@ -33,61 +33,61 @@ export class LeaveReportComponent implements OnInit {
   constructor(
     private leavesService: LeavesService,
     private employeesService: EmployeesService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadEmployees();
     this.loadLeaves();
   }
 
-loadEmployees(): void {
-  this.employeesService.getEmployees().subscribe({
-    next: (data) => {
-      this.employees = data;
+  loadEmployees(): void {
+    this.employeesService.getEmployees().subscribe({
+      next: (data) => {
+        this.employees = data;
 
-      // Build employeeMap for quick lookup
-      this.employeeMap = this.employees.reduce((map, emp) => {
-        map[emp.id!] = emp; // ensure emp.id exists
-        return map;
-      }, {} as { [id: number]: Employee });
+        // Build employeeMap for quick lookup
+        this.employeeMap = this.employees.reduce((map, emp) => {
+          map[emp.id!] = emp; // ensure emp.id exists
+          return map;
+        }, {} as { [id: number]: Employee });
 
-    },
-    error: (err) => console.error('Error loading employees:', err)
-  });
-}
+      },
+      error: (err) => console.error('Error loading employees:', err)
+    });
+  }
 
-loadLeaves(): void {
-  this.leavesService.getAllLeaves().subscribe({
-    next: (data) => {
-      const leavesArray = data as any[];
-      this.leaves = leavesArray.map(leave => {
-        const days = (leave.days != null && Number.isFinite(+leave.days) && +leave.days > 0)
-          ? +leave.days
-          : this.calculateDays(leave.start_date, leave.end_date);
+  loadLeaves(): void {
+    this.leavesService.getAllLeaves().subscribe({
+      next: (data) => {
+        const leavesArray = data as any[];
+        this.leaves = leavesArray.map(leave => {
+          const days = (leave.days != null && Number.isFinite(+leave.days) && +leave.days > 0)
+            ? +leave.days
+            : this.calculateDays(leave.start_date, leave.end_date);
 
-        // compute remaining days for this employee
-        const used = this.leaves
-          ?.filter(l => l.employee_id === leave.employee_id && (l.status || '').toLowerCase() === 'approved' && l.id !== leave.id)
-          .reduce((sum, l) => sum + (l.days || 0), 0) || 0;
+          // compute remaining days for this employee
+          const used = this.leaves
+            ?.filter(l => l.employee_id === leave.employee_id && (l.status || '').toLowerCase() === 'approved' && l.id !== leave.id)
+            .reduce((sum, l) => sum + (l.days || 0), 0) || 0;
 
-        const remaining = this.totalLeaves - used - days;
+          const remaining = this.totalLeaves - used - days;
 
-        return {
-          ...leave,
-          id: +leave.id,
-          employee_id: +leave.employee_id,
-          status: (leave.status || 'pending').toLowerCase() === 'approved' ? 'Approved' : 'Pending',
-          days,
-          remaining_days: remaining > 0 ? remaining : 0
-        };
-      });
+          return {
+            ...leave,
+            id: +leave.id,
+            employee_id: +leave.employee_id,
+            status: (leave.status || 'pending').toLowerCase() === 'approved' ? 'Approved' : 'Pending',
+            days,
+            remaining_days: remaining > 0 ? remaining : 0
+          };
+        });
 
-      // Update filteredLeaves as well
-      this.filteredLeaves = [...this.leaves];
-    },
-    error: (err) => console.error('Error loading leaves:', err)
-  });
-}
+        // Update filteredLeaves as well
+        this.filteredLeaves = [...this.leaves];
+      },
+      error: (err) => console.error('Error loading leaves:', err)
+    });
+  }
 
   calculateDays(start: string, end: string): number {
     if (!start || !end) return 0;
@@ -169,21 +169,21 @@ loadLeaves(): void {
     document.body.removeChild(link);
   }
 
-getEmployeeImage(employeeId: number): string {
-  const emp = this.employeeMap[employeeId];
-  return emp?.image ? `http://localhost:3000${emp.image}` : 'assets/default-user.png';
-}
+  getEmployeeImage(employeeId: number): string {
+    const emp = this.employeeMap[employeeId];
+    return emp?.image ? `http://localhost:3000${emp.image}` : 'assets/default-user.png';
+  }
 
-onImageError(event: any) {
-  event.target.src = 'assets/default-user.png';
-}
+  onImageError(event: any) {
+    event.target.src = 'assets/default-user.png';
+  }
 
-getRemainingDays(leave: any): number {
-  const used = this.leaves
-    .filter(l => l.employee_id === leave.employee_id && (l.status || '').toLowerCase() === 'approved' && l.id !== leave.id)
-    .reduce((sum, l) => sum + (l.days || 0), 0);
-  const remaining = this.totalLeaves - used - (leave.days || 0);
-  return remaining > 0 ? remaining : 0;
-}
+  getRemainingDays(leave: any): number {
+    const used = this.leaves
+      .filter(l => l.employee_id === leave.employee_id && (l.status || '').toLowerCase() === 'approved' && l.id !== leave.id)
+      .reduce((sum, l) => sum + (l.days || 0), 0);
+    const remaining = this.totalLeaves - used - (leave.days || 0);
+    return remaining > 0 ? remaining : 0;
+  }
 
 }

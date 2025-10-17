@@ -1,0 +1,23 @@
+.welcome-text {
+  color: rgb(233, 231, 231) !important;
+  font-size: 15px;   /* tu jyasta pahije tevha 20px, 22px kadhun bagh */
+  font-weight: 400;  /* thoda jast bold disayla */
+}
+/* Logout button base style */
+/* When sidebar is collapsed */
+.sidebar.collapsed .logout-btn span {
+    display: none;  /* hides the text */
+}
+
+.sidebar.collapsed .logout-btn {
+    width: 50px; /* adjust to fit just the icon */
+    padding: 10px;
+    text-align: center;
+}
+.company-name {
+  font-size: 1.3rem; /* nicely balanced size */
+  color: white;
+  letter-spacing: 0.5px;
+  text-transform: capitalize;
+  font-weight: normal; /* not bold */
+}

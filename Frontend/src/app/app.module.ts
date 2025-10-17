@@ -39,10 +39,16 @@ import { EmployeeTeamComponent } from './employee-team/employee-team.component';
 import { EmployeeDetailsComponent } from './employee-details/employee-details.component';
 import { LeaveTypesComponent } from './leave-types/leave-types.component';
 import { AddUserComponent } from './add-user/add-user.component';
-import { ManageAdminComponent } from './manage-admin/manage-admin.component';
-import { ManageLineManagerComponent } from './manage-line-manager/manage-line-manager.component';
-import { ManageComponent } from './manage/manage.component';
-import { ManageSuperAdminComponent } from './manage-super-admin/manage-super-admin.component';
+import { FundMasterComponent } from './fund-master/fund-master.component';
+import { PermissionChartComponent } from './permission-chart/permission-chart.component';
+import { NgApexchartsModule } from "ng-apexcharts";
+import { DocumentComponent } from './document/document.component';
+import { ManageRoleComponent } from './manage-role/manage-role.component';
+import { UserManagementComponent } from './user-management/user-management.component';
+import { AttendanceComponent } from './attendance/attendance.component';
+import { AttendanceReportComponent } from './reports/attendance-report/attendance-report.component';
+import { CompanyComponent } from './company/company.component';
+import { SummaryAttendanceComponent } from './summary-attendance/summary-attendance.component';
 
 @NgModule({
   declarations: [
@@ -77,10 +83,15 @@ import { ManageSuperAdminComponent } from './manage-super-admin/manage-super-adm
     EmployeeDetailsComponent,
     LeaveTypesComponent,
     AddUserComponent,
-    ManageAdminComponent,
-    ManageLineManagerComponent,
-    ManageComponent,
-    ManageSuperAdminComponent
+    FundMasterComponent,
+    PermissionChartComponent,
+    DocumentComponent,
+    ManageRoleComponent,
+    UserManagementComponent,
+    AttendanceComponent,
+    AttendanceReportComponent,
+    CompanyComponent,
+    SummaryAttendanceComponent,
   ],
   imports: [
     BrowserModule,
@@ -91,6 +102,7 @@ import { ManageSuperAdminComponent } from './manage-super-admin/manage-super-adm
     FullCalendarModule,
     HttpClientModule,
     ReactiveFormsModule,
+     NgApexchartsModule 
     
 
   ],

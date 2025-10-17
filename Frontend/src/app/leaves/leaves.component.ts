@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EmployeesService } from '../Services/Employees-serives/employees.service';
 import { Leave } from '../models/leave.model';
 import { Router } from '@angular/router';
+import { LeaveTypesService } from '../Services/leaves-type/leave-type.service';
+import { LeaveType } from '../leave-types/leave-types.component';
+import { AuthService } from '../Services/Auth-services/auth.service';
 
 
 declare var bootstrap: any;
@@ -25,53 +28,49 @@ export class LeavesComponent {
   selectedEmployeeId!: number;
   appliedDays: number = 0; // from "Number of Days Leave" input
   leaves: Array<any> = []; // your list of leaves (must be loaded before calc)
+  canLeaveAction: boolean = false;
+  userRole: string = '';
+  user: any;
+  leaveTypes: LeaveType[] = [];
+  isSuperAdmin: boolean = false;
+  currentUserId: number = 0;
+allEmployees: any[] = []; // all employees for name resolution
 
   constructor(
     private fb: FormBuilder,
     private leavesService: LeavesService,
     private employeesService: EmployeesService,
-    private router: Router
+    private router: Router,
+    private leaveTypesService: LeaveTypesService,
+    private authService: AuthService
   ) { }
 
-  ngOnInit(): void {
-    // initialize form once
-    this.leaveForm = this.fb.group({
-      id: [null],
-      employee_id: [null, Validators.required],   // force number
-      leave_type: ['', Validators.required],
-      start_date: ['', Validators.required],
-      end_date: ['', Validators.required],
-      duration: ['Full Day', Validators.required],
-      reason: [''],
-      status: ['pending'],
-      days: [0],
+ngOnInit(): void {
+  const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  this.user = storedUser;
+
+  this.currentUserId = this.user?.employee_id || 0;   // ← important
+  this.selectedEmployeeId = this.currentUserId;
+
+  this.canLeaveAction = this.authService.canLeaveAction();
+  this.isSuperAdmin = this.authService.isSuperAdmin();
+
+  this.initForm();
+  this.loadEmployees();
+  this.loadLeaves();
+  this.loadLeaveTypes();
+  this.watchLeaveForm();
+}
+  loadLeaveTypes(): void {
+    this.leaveTypesService.getLeaveTypes().subscribe({
+      next: (data) => {
+        // Active leave types only
+        this.leaveTypes = data.filter(l => l.status === 'Active');
+        console.log('Loaded Leave Types:', this.leaveTypes);
+      },
+      error: (err) => console.error('Error loading leave types:', err)
     });
-
-    this.loadLeaves();
-    this.loadEmployees();
-    this.watchLeaveForm();
-
-
-this.leaveForm.valueChanges.subscribe(val => {
-  if (!this.isEditMode) return;
-
-  const empId = val.employee_id;
-  const appliedDays = val.start_date && val.end_date 
-    ? this.calculateDays(val.start_date, val.end_date)
-    : 0;
-
-  const excludeId = val.id;
-  const usedDays = this.leaves
-    .filter(l => l.employee_id === empId && l.status === 'approved' && l.id !== excludeId)
-    .reduce((sum, l) => sum + (l.days || 0), 0);
-
-  this.usedLeaves = usedDays + appliedDays;
-  this.remainingLeaves = this.totalLeaves - this.usedLeaves;
-});
-
   }
-
-
 
   /** wire live updates */
   private setupLiveCalc(): void {
@@ -116,41 +115,54 @@ this.leaveForm.valueChanges.subscribe(val => {
     this.remainingLeaves = this.totalLeaves - used; // NOTE: not subtracting current form days
   }
 
-  loadLeaves(): void {
-    this.leavesService.getAllLeaves().subscribe({
-      next: (data) => {
-        const leavesArray = data as any[];
-        this.leaves = leavesArray.map(leave => ({
-          ...leave,
-          id: +leave.id,
-          employee_id: +leave.employee_id,
-          status: (leave.status || 'pending').toLowerCase() === 'approved' ? 'Approved' : 'Pending',
-          days: (leave.days != null && Number.isFinite(+leave.days) && +leave.days > 0)
-            ? +leave.days
-            : this.calculateDays(leave.start_date, leave.end_date),
-        }));
-      },
-      error: (err) => console.error('Error loading leaves:', err)
-    });
+loadLeaves(): void {
+  this.leavesService.getAllLeaves().subscribe({
+    next: (data) => {
+      const normalizedLeaves = (data as any[]).map(leave => ({
+        ...leave,
+        id: +leave.id,
+        employee_id: +leave.employee_id,
+        status: leave.status ? leave.status : 'Pending',
+        days: leave.days || this.calculateDays(leave.start_date, leave.end_date),
+      }));
 
-  }
-
-  // calculateDays(start: string, end: string): number {
-  //   const startDate = new Date(start);
-  //   const endDate = new Date(end);
-  //   const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-  //   return Math.ceil(diffTime / (1000 * 3600 * 24)) + 1;
-  // }
+      if (this.isSuperAdmin || this.canLeaveAction) {
+        // Admin/HR/Super Admin: see all leaves
+        this.leaves = normalizedLeaves;
+      } else {
+        // Normal user: only own leaves
+        const currentId = this.authService.getUser()?.employee_id;
+        this.leaves = normalizedLeaves.filter(l => l.employee_id === currentId);
+      }
+    },
+    error: (err) => console.error('Error loading leaves:', err)
+  });
+}
 
   calculateRemainingLeaves() {
     this.remainingLeaves = this.totalLeaves - this.usedLeaves;
   }
-  loadEmployees(): void {
-    this.employeesService.getEmployees().subscribe({
-      next: (data: any) => (this.employees = data),
-      error: (err: any) => console.error('Error loading employees:', err)
-    });
-  }
+loadEmployees() {
+  this.employeesService.getEmployees().subscribe({
+    next: (data: any[]) => {
+      // store all employees for name display
+      this.allEmployees = data;
+
+      // for dropdown/action purposes
+      if (!this.canLeaveAction && !this.isSuperAdmin) {
+        // Normal employee: only self for selection
+        this.employees = [this.authService.getUser()];
+        this.currentUserId = this.authService.getUser()?.employee_id || 0;
+      } else {
+        // Admin / HR / Super Admin: all employees
+        this.employees = data;
+      }
+    },
+    error: (err) => console.error(err)
+  });
+}
+
+
 
   initForm(): void {
     this.leaveForm = this.fb.group({
@@ -188,6 +200,7 @@ this.leaveForm.valueChanges.subscribe(val => {
       const leaveId = this.leaveForm.get('id')?.value;
       this.leavesService.updateLeave(leaveId, this.leaveForm.value).subscribe({
         next: () => {
+          alert('Salary updated successfully ✅');
           this.leaveForm.reset();
           this.isEditMode = false;
           this.loadLeaves();
@@ -198,6 +211,7 @@ this.leaveForm.valueChanges.subscribe(val => {
     } else {
       this.leavesService.createLeave(this.leaveForm.value).subscribe({
         next: () => {
+          alert('Leave updated successfully ✅');
           this.leaveForm.reset();
           this.loadLeaves();
           this.closeModal('addLeaveModal');
@@ -208,19 +222,16 @@ this.leaveForm.valueChanges.subscribe(val => {
     }
   }
 
-  confirmDelete(leaveId?: number): void {
-    if (leaveId === undefined) return;
+  confirmDelete(leaveId?: number, employeeId?: number): void {
+    if (!leaveId || !this.canManageLeave(employeeId!)) return;
+
     if (confirm('Are you sure you want to delete this leave?')) {
       this.leavesService.deleteLeave(leaveId).subscribe({
-        next: () => {
-          this.loadLeaves();
-          alert('Leave deleted successfully');
-        },
+        next: () => this.loadLeaves(),
         error: (err) => console.error('Failed to delete leave:', err)
       });
     }
   }
-
   closeModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
@@ -231,41 +242,12 @@ this.leaveForm.valueChanges.subscribe(val => {
     }
   }
 
-  getEmployeeName(employeeId: number): string {
-    const employee = this.employees.find(emp => emp.id === employeeId);
-    return employee ? `${employee.firstname} ${employee.lastName}` : 'Unknown';
-  }
+getEmployeeName(empId: number): string {
+  const emp = this.allEmployees.find(e => e.employee_id === empId || e.id === empId);
+  if (!emp) return 'Unknown';
+  return `${emp.firstname || ''} ${emp.lastName || ''}`.trim();
+}
 
-
-
-  // openEditModal(leave: Leave): void {
-  //   this.isEditMode = true;
-
-  //   this.leaveForm.patchValue({
-  //     id: leave.id,
-  //     employee_id: leave.employee_id,
-  //     leave_type: leave.leave_type || '',
-  //     start_date: this.formatDateToInput(leave.start_date),
-  //     end_date: this.formatDateToInput(leave.end_date),
-  //     reason: leave.reason,
-  //     status: leave.status || 'pending',
-  //     duration: leave.duration || 'Full Day',
-  //     days: leave.days || this.calculateDays(leave.start_date, leave.end_date)
-  //   });
-
-  //   // ✅ main fix: calculate used leaves excluding this leave
-  //   const used = this.getUsedLeaves(leave.employee_id, leave.id);
-  //   this.usedLeaves = used;
-
-  //   // ✅ remaining leaves = total - used
-  //   this.remainingLeaves = this.totalLeaves - used;
-
-  //   // show modal
-  //   const modalEl = document.getElementById('addLeaveModal');
-  //   if (modalEl) {
-  //     bootstrap.Modal.getOrCreateInstance(modalEl).show();
-  //   }
-  // }
 
 
   calculateLeaves(employeeId: number, excludeLeaveId?: number): void {
@@ -296,55 +278,16 @@ this.leaveForm.valueChanges.subscribe(val => {
     return this.totalLeaves - usedDays;
   }
 
-  // ✅ helper functions
-  // getUsedLeaves(employeeId: number, excludeLeaveId?: number): number {
-  //   return this.leaves
-  //     .filter(
-  //       l =>
-  //         l.employee_id === employeeId &&
-  //         l.status === 'approved' &&
-  //         l.id !== excludeLeaveId
-  //     )
-  //     .reduce((sum, l) => sum + (l.days || 0), 0);
-  // }
-
   onEmployeeSelect(employeeId: number) {
-    // 1️⃣ Get all approved leaves for this employee
     const empLeaves = this.leaves.filter(
       l => l.employee_id === employeeId && l.status === 'approved'
     );
 
-    // 2️⃣ Calculate used leaves
     this.usedLeaves = empLeaves.reduce((sum, l) => sum + Number(l.days || 0), 0);
 
-    // 3️⃣ Calculate remaining leaves
     this.remainingLeaves = this.totalLeaves - this.usedLeaves;
   }
 
-  // onEmployeeChange(event: any) {
-  //   const employeeId = +event.target.value;
-
-  //   if (!employeeId) {
-  //     this.usedLeaves = 0;
-  //     this.remainingLeaves = this.totalLeaves;
-  //     return;
-  //   }
-
-  //   const excludeId = this.isEditMode ? +this.leaveForm.get('id')?.value : undefined;
-
-  //   const used = this.getUsedLeaves(employeeId, excludeId);
-  //   this.usedLeaves = used;
-  //   this.remainingLeaves = this.totalLeaves - used;
-
-  //   // optional: update current applied days if start/end selected
-  //   const start = this.leaveForm.get('start_date')?.value;
-  //   const end = this.leaveForm.get('end_date')?.value;
-  //   if (start && end) {
-  //     const appliedDays = this.calculateDays(start, end);
-  //     this.leaveForm.patchValue({ days: appliedDays }, { emitEvent: false });
-  //     this.remainingLeaves -= appliedDays; // subtract current applied leave
-  //   }
-  // }
   updateLeavesForEmployee(employeeId: number, excludeLeaveId?: number) {
     if (!employeeId) {
       this.usedLeaves = 0;
@@ -388,36 +331,7 @@ this.leaveForm.valueChanges.subscribe(val => {
     this.remainingLeaves = this.totalLeaves - usedDays;
   }
 
-  // 🔹 Watch for changes in form
-  // watchLeaveForm(): void {
-  //   this.leaveForm.valueChanges.subscribe(val => {
-  //     const appliedDays = (val.start_date && val.end_date)
-  //       ? this.calculateDays(val.start_date, val.end_date)
-  //       : 0;
 
-  //     this.leaveForm.patchValue({ days: appliedDays }, { emitEvent: false });
-
-  //     this.usedLeaves = this.getAlreadyUsedLeaves(val.employee_id);
-
-  //     this.remainingLeaves = this.totalLeaves - this.usedLeaves - appliedDays;
-  //   });
-  // }
-
-  // 🔹 Calculate no. of days between start & end
-  // calculateDays(start: string, end: string): number {
-  //   const startDate = new Date(start);
-  //   const endDate = new Date(end);
-
-  //   if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-  //     return 0;
-  //   }
-
-  //   const diffTime = endDate.getTime() - startDate.getTime();
-  //   const days = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-  //   return days > 0 ? days : 0;
-  // }
-
-  // 🔹 Get already approved leaves for employee
   getAlreadyUsedLeaves(employeeId: number): number {
     if (!employeeId) return 0;
 
@@ -426,38 +340,31 @@ this.leaveForm.valueChanges.subscribe(val => {
       .reduce((sum, l) => sum + (l.days || 0), 0);
   }
 
-
-
   openEditModal(leave: Leave) {
-  this.isEditMode = true;
+    if (!this.canLeaveAction && !this.isSuperAdmin) return;
+    this.isEditMode = true;
+    this.leaveForm.patchValue({
+      id: leave.id,
+      employee_id: leave.employee_id,
+      leave_type: leave.leave_type,
+      start_date: this.formatDateToInput(leave.start_date),
+      end_date: this.formatDateToInput(leave.end_date),
+      reason: leave.reason,
+      status: leave.status,
+      duration: leave.duration || 'Full Day',
+      days: leave.days || this.calculateDays(leave.start_date, leave.end_date)
+    });
 
-  this.leaveForm.patchValue({
-    id: leave.id,
-    employee_id: leave.employee_id,
-    leave_type: leave.leave_type,
-    start_date: this.formatDateToInput(leave.start_date),
-    end_date: this.formatDateToInput(leave.end_date),
-    reason: leave.reason,
-    status: leave.status,
-    duration: leave.duration || 'Full Day',
-    days: leave.days || this.calculateDays(leave.start_date, leave.end_date)
-  });
+    this.updateUsedAndRemainingLeaves(leave.employee_id);
 
-  // ✅ update used & remaining leaves automatically
-  this.updateUsedAndRemainingLeaves(leave.employee_id);
-
-  const modalEl = document.getElementById('addLeaveModal');
-  if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
-}
-
-
-
-  // 🔹 Employee change watcher (edit or add)
+    const modalEl = document.getElementById('addLeaveModal');
+    if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  }
   onEmployeeChange(event: any) {
 
     const employeeId = +event.target.value;
     const excludeId = this.isEditMode ? +this.leaveForm.get('id')?.value : undefined;
-      this.updateUsedAndRemainingLeaves(employeeId); 
+    this.updateUsedAndRemainingLeaves(employeeId);
 
     if (!employeeId) {
       this.usedLeaves = 0;
@@ -478,57 +385,17 @@ this.leaveForm.valueChanges.subscribe(val => {
       .reduce((sum, l) => sum + (l.days || 0), 0);
   }
 
-  // 🔹 Watch start_date & end_date changes to auto update applied days
-  watchLeaveForm(): void {
-    this.leaveForm.valueChanges.subscribe(val => {
-      const appliedDays = (val.start_date && val.end_date)
-        ? this.calculateDays(val.start_date, val.end_date)
-        : 0;
-
-      this.leaveForm.patchValue({ days: appliedDays }, { emitEvent: false });
-
-      const employeeId = val.employee_id;
-      const excludeId = this.isEditMode ? val.id : undefined;
-      const used = this.getUsedLeaves(employeeId, excludeId);
-
-      this.usedLeaves = used;
-      this.remainingLeaves = this.totalLeaves - used - appliedDays;
-    });
-  }
-
-  // 🔹 Calculate no. of days between start & end
-  calculateDays(start: string, end: string): number {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return 0;
-
-    const diffTime = endDate.getTime() - startDate.getTime();
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-  }
-  // updateUsedAndRemainingLeaves(employeeId: number): void {
-  //   if (!employeeId) {
-  //     this.usedLeaves = 0;
-  //     this.remainingLeaves = this.totalLeaves;
-  //     return;
-  //   }
-
-  //   const excludeId = this.isEditMode ? +this.leaveForm.get('id')?.value : undefined;
-
-  //   // Already approved leaves
-  //   const usedDays = this.leaves
-  //     .filter(l => l.employee_id === employeeId && l.status === 'approved' && l.id !== excludeId)
-  //     .reduce((sum, l) => sum + (l.days || 0), 0);
-
-  //   this.usedLeaves = usedDays;
-  //   this.remainingLeaves = this.totalLeaves - usedDays;
-  // }
 
 openAddModal(): void {
   this.isEditMode = false;
+  if (!this.canLeaveAction && !this.isSuperAdmin) {
+    this.employees = [this.authService.getUser()];
+  } else {
+    this.loadEmployees();
+  }
 
-  // Reset the form
   this.leaveForm.reset({
-    employee_id: '',
+    employee_id: this.currentUserId, // important
     leave_type: '',
     start_date: '',
     end_date: '',
@@ -538,39 +405,74 @@ openAddModal(): void {
     days: 0
   });
 
-  // Show the modal
   const modalEl = document.getElementById('addLeaveModal');
   if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
-  updateUsedAndRemainingLeaves(employeeId: number): void {
-  if (!employeeId) {
-    this.usedLeaves = 0;
-    this.remainingLeaves = this.totalLeaves;
-    return;
+
+  onStatusChange(leave: Leave) {
+    if (!leave.id) return;
+
+    // API call to update leave status
+    this.leavesService.updateLeave(leave.id, { ...leave }).subscribe({
+      next: () => {
+        console.log('Leave status updated successfully');
+        // Optional: show success toast/alert
+      },
+      error: (err) => console.error('Failed to update leave status:', err)
+    });
   }
 
-  const excludeId = this.isEditMode ? +this.leaveForm.get('id')?.value : undefined;
-
-  const usedDays = this.leaves
-    .filter(l => l.employee_id === employeeId && l.status === 'approved' && l.id !== excludeId)
-    .reduce((sum, l) => sum + (l.days || 0), 0);
-
-  this.usedLeaves = usedDays;
-  this.remainingLeaves = this.totalLeaves - usedDays;
-}
 
 
- onStatusChange(leave: Leave) {
-  if (!leave.id) return;
+  calculateDays(start: string, end: string): number {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return 0;
 
-  // API call to update leave status
-  this.leavesService.updateLeave(leave.id, { ...leave }).subscribe({
-    next: () => {
-      console.log('Leave status updated successfully');
-      // Optional: show success toast/alert
-    },
-    error: (err) => console.error('Failed to update leave status:', err)
-  });
-}
+    const diffTime = endDate.getTime() - startDate.getTime();
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  }
+
+  updateUsedAndRemainingLeaves(employeeId: number): void {
+    if (!employeeId) {
+      this.usedLeaves = 0;
+      this.remainingLeaves = this.totalLeaves;
+      return;
+    }
+
+    const excludeId = this.isEditMode ? +this.leaveForm.get('id')?.value : undefined;
+
+    const usedDays = this.leaves
+      .filter(l => l.employee_id === employeeId && l.status.toLowerCase() === 'approved' && l.id !== excludeId)
+      .reduce((sum, l) => sum + (l.days || 0), 0);
+
+    this.usedLeaves = usedDays;
+    this.remainingLeaves = this.totalLeaves - usedDays;
+  }
+
+  watchLeaveForm(): void {
+    this.leaveForm.valueChanges.subscribe(val => {
+      const appliedDays = (val.start_date && val.end_date)
+        ? this.calculateDays(val.start_date, val.end_date)
+        : 0;
+
+      this.leaveForm.patchValue({ days: appliedDays }, { emitEvent: false });
+
+      if (val.employee_id) {
+        this.updateUsedAndRemainingLeaves(val.employee_id);
+        this.remainingLeaves -= appliedDays; // current applied days
+      }
+    });
+  }
+  canManageLeave(employeeId: number): boolean {
+    if (this.isSuperAdmin) return true;
+    return this.canLeaveAction && employeeId === this.currentUserId;
+  }
+
+  canViewLeave(employeeId: number): boolean {
+    if (this.isSuperAdmin) return true;
+    return employeeId === this.currentUserId;
+  }
+
 
 }

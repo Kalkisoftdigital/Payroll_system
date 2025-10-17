@@ -5,8 +5,10 @@ import {
   ViewChild,
   ElementRef,
   HostListener,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ChatService } from 'src/app/Services/Chat-services/chat.service';
 
 interface Employee {
   id: number;
@@ -30,7 +32,10 @@ interface ChatMessage {
   sending?: boolean;
   status?: 'sent' | 'delivered' | 'seen';
   read_status?: number;
-  text?: string;  
+  text?: string;
+    favourite?: boolean;
+  unread?: boolean;
+
 }
 
 @Component({
@@ -43,9 +48,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   filteredEmployees: Employee[] = [];
   selectedEmployee: Employee | null = null;
   showChatSearch: boolean = false;
-selectedMessageId: number | null = null;
+  selectedMessageId: number | null = null;
   messages: ChatMessage[] = [];
   newMessage = '';
+  replyToMessage: any = null;
+
 
   searchTerm = '';
   showDropdown = false;
@@ -65,21 +72,25 @@ selectedMessageId: number | null = null;
   status?: 'sent' | 'delivered' | 'seen';
 
   backendBaseUrl = 'http://localhost:3000';
-  currentUserId: number = 1;
+  currentUserId: number = 191;
 
   @ViewChild('chatContainer') chatContainer!: ElementRef;
   @ViewChild('dropdownRoot') dropdownRoot!: ElementRef;
   @ViewChild('cameraInput') cameraInput!: ElementRef<HTMLInputElement>;
   @ViewChild('galleryInput') galleryInput!: ElementRef<HTMLInputElement>;
   @ViewChild('audioInput') audioInput!: ElementRef<HTMLInputElement>;
-  chatService: any;
+  imageUrl: string = `http://localhost:3000/assets/img/employees/default.jpg?t=${Date.now()}`;
+  imgSrc!: string;
 
-  constructor(private http: HttpClient) {}
+
+  constructor(private http: HttpClient, private chatService: ChatService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadEmployees();
     // Load persisted state
     this.restoreLocal();
+    this.imgSrc = 'assets/img/employees/default.jpg?t=' + Date.now();
+    this.cdr.detectChanges();
   }
 
   ngAfterViewChecked(): void {
@@ -105,12 +116,13 @@ selectedMessageId: number | null = null;
       e.name.toLowerCase().includes(term)
     );
   }
-// Toggle when clicking on 3-dot menu
+  // Toggle when clicking on 3-dot menu
 
-toggleOptions(messageId: number) {
-  this.selectedMessageId =
-    this.selectedMessageId === messageId ? null : messageId;
-}
+
+  updateImage() {
+    this.imageUrl = `http://localhost:3000/assets/img/employees/default.jpg?t=${Date.now()}`;
+  }
+
 
   // ---------- Data load ----------
   loadEmployees(): void {
@@ -152,7 +164,7 @@ toggleOptions(messageId: number) {
         from: emp.id,
         to: this.currentUserId,
       })
-      .subscribe({ next: () => {}, error: () => {} });
+      .subscribe({ next: () => { }, error: () => { } });
   }
 
   // ---------- Messages ----------
@@ -272,11 +284,11 @@ toggleOptions(messageId: number) {
           msg.kind === 'text'
             ? msg.content
             : JSON.stringify({
-                kind: msg.kind,
-                content: msg.content,
-                mime: msg.mime,
-                name: msg.name,
-              }),
+              kind: msg.kind,
+              content: msg.content,
+              mime: msg.mime,
+              name: msg.name,
+            }),
       })
       .subscribe({
         next: (res: any) => {
@@ -626,52 +638,86 @@ toggleOptions(messageId: number) {
 
 
 
+  replyMessage(msg: any) {
+    console.log("Reply to:", msg.content);
+    this.replyToMessage = msg; // store message for preview
+    this.selectedMessageId = null;
+  }
 
+  forwardMessage(msg: any) {
+    console.log("Forward:", msg.content);
+    const receiverId = prompt("Enter Employee ID to forward:");
+    if (!receiverId) return;
 
-replyMessage(msg: any) {
-  console.log("Reply to:", msg.content);
+    const newMsg = {
+      ...msg,
+      id: Date.now(), // temp ID
+      receiverId,
+      forwarded: true
+    };
+
+    this.messages.push(newMsg);
+    this.selectedMessageId = null;
+  }
+
+  copyMessage(msg: any) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(msg.content).then(() => {
+        alert("✅ Copied!");
+      });
+    } else {
+      console.warn("Clipboard API not supported");
+    }
+    this.selectedMessageId = null;
+  }
+
+ markFavourite(msg: ChatMessage) {
+  console.log("⭐ Toggled Favourite:", msg.content);
+  this.messages = this.messages.map(m =>
+    m.id === msg.id ? { ...m, favourite: !m.favourite } : m
+  );
   this.selectedMessageId = null;
 }
 
-forwardMessage(msg: any) {
-  console.log("Forward:", msg.content);
+markUnread(msg: ChatMessage) {
+  console.log("📩 Toggled Unread:", msg.content);
+  this.messages = this.messages.map(m =>
+    m.id === msg.id ? { ...m, unread: !m.unread } : m
+  );
   this.selectedMessageId = null;
 }
 
-copyMessage(msg: any) {
-  navigator.clipboard.writeText(msg.content);
-  alert("Copied!");
-  this.selectedMessageId = null;
-}
 
-markFavourite(msg: any) {
-  console.log("Marked Favourite:", msg.content);
-  this.selectedMessageId = null;
-}
 
-deletedmessage(messageId: number) {
-  this.messages = this.messages.filter(m => m.id !== messageId);
-  this.selectedMessageId = null;
-}
+  toggleOptions(msgId: number) {
+    this.selectedMessageId =
+      this.selectedMessageId === msgId ? null : msgId;
+  }
 
-markUnread(msg: any) {
-  console.log("Marked as Unread:", msg.content);
-  this.selectedMessageId = null;
-}
+  closeReplyPreview() {
+    this.replyToMessage = null;
+  }
 
-deletemessage(id: number) {
+  ngAfterViewInit() {
+    this.imageUrl = this.imageUrl + '?t=' + Date.now();
+  }
+  deletemessage(id: number) {
     const ok = confirm('⚠️ Delete this message?');
     if (!ok) return;
 
     this.chatService.deleteMessage(id).subscribe({
-      next: (res: { success: boolean; message: string }) => {
+      next: (res: any) => {
         console.log("✅ Delete response:", res);
+        // 👇 confirm ID matches
+        console.log("Before delete:", this.messages);
         this.messages = this.messages.filter(m => m.id !== id);
+        console.log("After delete:", this.messages);
+        this.selectedMessageId = null;
       },
       error: (err: any) => {
         console.error("❌ Delete error:", err);
       }
     });
-  } 
+  }
 
 }

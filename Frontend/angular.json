@@ -29,17 +29,16 @@
               "src/favicon.ico",
               "src/assets"
             ],
-"styles": [
-  "src/assets/css/bootstrap.min.css",
-  "src/assets/plugins/tabler-icons/tabler-icons.min.css",
-  "src/assets/plugins/simplebar/simplebar.min.css",
-  "src/assets/plugins/fontawesome/css/fontawesome.min.css",
-  "src/assets/plugins/fontawesome/css/all.min.css",
-  "src/assets/plugins/flatpickr/flatpickr.min.css",
-  "src/assets/plugins/select2/css/select2.min.css",
-  "src/assets/css/style.css"
-  
-],
+            "styles": [
+              "src/assets/css/bootstrap.min.css",
+              "src/assets/plugins/tabler-icons/tabler-icons.min.css",
+              "src/assets/plugins/simplebar/simplebar.min.css",
+              "src/assets/plugins/fontawesome/css/fontawesome.min.css",
+              "src/assets/plugins/fontawesome/css/all.min.css",
+              "src/assets/plugins/flatpickr/flatpickr.min.css",
+              "src/assets/plugins/select2/css/select2.min.css",
+              "src/assets/css/style.css"
+            ],
             "scripts": [
               "src/assets/js/jquery-3.7.1.min.js",
               "src/assets/js/bootstrap.bundle.min.js",
@@ -52,7 +51,7 @@
               "src/assets/js/script.js",
               "src/assets/plugins/flatpickr/flatpickr.min.js",
               "node_modules/jquery/dist/jquery.min.js",
-"node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ],
             "allowedCommonJsDependencies": [
               "c3"

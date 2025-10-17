@@ -12,6 +12,9 @@ import { Validators } from '@angular/forms';
 import { LeavesService } from '../Services/Leaves-services/leaves.service';
 import { Leave } from '../models/leave.model';  // Import only
 import { SalaryService } from '../Services/Salary-services/salary.service';
+import { forkJoin } from 'rxjs';
+import { DepartmentService } from '../Services/Department-serives/department.service';
+
 
 import { SalaryTransaction } from '../models/salary.model'; // Import the model
 
@@ -37,7 +40,7 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
   leavesTaken: number = 0;        // Initially 0
   leavesRemaining: number = 0;    // Initially 0
   workFromHome: number = 0;       // Initially 0
-
+  basicForm!: FormGroup;
   employees: any[] = [];
   selectedEmployeeId?: number;
   employee?: Employee;
@@ -46,6 +49,10 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
   newDocument: any = {};
   documents: EmployeeDocument[] = [];
   backendBaseUrl = 'http://localhost:3000';
+  personalForm: FormGroup;
+  salaryDetails: any;
+  employeeId!: number;
+
 
   // Edit document
   editDocumentForm: FormGroup;
@@ -53,11 +60,33 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
   editingDocument?: EmployeeDocument;
   bankDetails: any = {};        // Stores bank info
   transactions: any[] = [];     // Stores salary transactions
+  departments: { id?: number; name: string }[] = [];
 
   // Leave management
   selectedEmployeeIdForLeave?: number;  // Selected employee in the modal
   numberOfDays: number = 0;
   leaveForm: FormGroup;
+  lineManagerName: string = '';
+  lineManagerImage: string = 'assets/img/default-avatar.png';
+
+
+  // Salary variables
+  totalAnnual: number = 0;
+  totalMonthly: number = 0;
+
+  basicPercent: number = 50;
+  basicMonthly: number = 0;
+  basicAnnual: number = 0;
+
+  hraPercent: number = 50;
+  hraMonthly: number = 0;
+  hraAnnual: number = 0;
+
+  fixedMonthly: number = 0;
+  fixedAnnual: number = 0;
+
+  conveyance: number = 0;
+  conveyance_annual: number = 0;
 
 
   leaves: Leave[] = [];
@@ -77,7 +106,8 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
     private http: HttpClient,
     private leavesService: LeavesService,
     private salaryService: SalaryService,
-    private router: Router
+    private router: Router,
+    private departmentService: DepartmentService
   ) {
     this.editContactForm = this.fb.group({
       phone: [''],
@@ -91,8 +121,6 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
       file: [null]
     });
 
-
-
     this.leaveForm = this.fb.group({
       id: [null],
       employee_id: ['', Validators.required],
@@ -102,21 +130,45 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
       duration: ['', Validators.required],
       reason: ['']
     });
+
+    this.basicForm = this.fb.group({
+      email: [''],
+      phone: [''],
+      position: [''],
+      departmentId: [''],
+      fathersName: [''],
+      aadharNo: [''],
+      panCard: [''],
+      gender: [''],
+      dateOfJoining: [''],
+      firstname: [''],
+      lastName: ['']
+    });
+
+    this.personalForm = this.fb.group({
+      fathersName: [''],
+      aadharNo: [''],
+      panCard: [''],
+      dob: [''],
+      email: [''],
+      address: [''],
+      id: ['']
+    });
   }
-
-
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
       this.loadEmployeeDetails(id);
       this.loadDocuments(id);
-      this.loadEmployees();
+      this.loadSalaryDetails(id);
+
 
       this.loadLeaves();
       this.loadEmployees();
 
       this.loadSalaryTransactions();
+      this.loadDepartments();
 
     }
   }
@@ -130,8 +182,10 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
   loadEmployeeDetails(id: number) {
     this.employeesService.getEmployee(id).subscribe({
       next: (data: Employee & { transactions?: any[] }) => {
+        console.log('Employee data received:', data);
         this.employee = data;
 
+        this.personalForm.patchValue({ id: data.id });
         // Contact info
         this.editContactForm.patchValue({
           phone: data.phone || '',
@@ -152,8 +206,21 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
 
         // Load leaves here too if needed
         this.loadLeaves();
+        this.lineManagerName = this.employee.lineManager || 'Not Assigned';
+        this.lineManagerImage = this.employee.profileImage || '';
+
       },
       error: (err) => console.error('Error loading employee', err)
+    });
+  }
+
+  loadDepartments() {
+    this.departmentService.getDepartments().subscribe({
+      next: (data) => {
+        this.departments = data;
+        console.log('Departments loaded:', this.departments);
+      },
+      error: (err) => console.error('Error loading departments:', err)
     });
   }
 
@@ -205,7 +272,6 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
       console.log('Selected file:', this.selectedFile);
     }
   }
-
   // Upload new document
   uploadDocument() {
     if (!this.selectedFile || !this.employee?.id) {
@@ -234,9 +300,7 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
       error: (err) => console.error('Upload error', err)
     });
   }
-
   // ---------------- Edit document ----------------
-
 
   loadEmployees() {
     this.employeesService.getEmployees().subscribe({
@@ -311,7 +375,6 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
       error: (err) => console.error('Error updating document:', err)
     });
   }
-
   // ---------------- Leave management ----------------
 
   // Calculate leave days
@@ -476,62 +539,313 @@ export class EmployeeDetailsComponent implements OnInit, AfterViewInit {
     return `${yyyy}-${mm}-${dd}`;
   }
 
-  // Load salary transactions
-
-
-
   loadSalaryTransactions(): void {
     if (!this.employee?.id) return;
 
     this.salaryService.getSalaryByEmployee(this.employee.id).subscribe({
       next: (rows: any[]) => {
-        console.log('Raw salary rows:', rows?.[0] ? Object.keys(rows[0]) : 'no rows');
-
         const currentId = Number(this.employee!.id);
 
-        // 1) Normalize keys coming from API (employee_id -> employeeId)
-        const normalized = (rows || []).map(r => {
-          const createdAtStr = r.created_at ?? r.createdAt ?? null;
-          const dateStr = r.date ?? r.forMonth ?? null;
+        // Normalize rows
+        this.transactions = (rows || []).map(r => ({
+          id: Number(r.id),
+          employeeId: Number(r.employee_id ?? 0),
+          basic: Number(r.basic ?? 0),
+          hra: Number(r.hra ?? 0),
+          total: Number(r.total ?? 0),
+          status: r.status ?? '',
+          created_at: r.created_at
+            ? new Date(r.created_at)
+            : r.date
+              ? new Date(r.date)   // fallback to Salary For date
+              : null,
+          date: r.date ? new Date(r.date) : null                     // Salary For
+        }))
+          .filter(t => t.employeeId === currentId);
 
-          const createdAt = createdAtStr
-            ? new Date((createdAtStr.replace?.(/\.$/, '') ?? createdAtStr))
-            : null;
-
-          const forDate = dateStr
-            ? new Date((dateStr.replace?.(/\.$/, '') ?? dateStr))
-            : null;
-
-          return {
-            id: Number(r.id),
-            employeeId: Number(r.employee_id ?? r.employeeId ?? 0),   // 👈 important
-            employee: r.employee ?? '',
-            basic: Number(r.basic ?? 0),
-            hra: Number(r.hra ?? 0),
-            total: Number(r.total ?? 0),
-            status: (r.status ?? '').toString(),
-            created_at: createdAt,           // Transfer Date
-            date: forDate,                   // Salary For (from DB `date`)
-            forMonth: forDate
-              ? forDate.toLocaleString('default', { month: 'long', year: 'numeric' })
-              : 'N/A'
-          };
-        });
-
-        // 2) Filter strictly by selected employee id
-        this.transactions = normalized.filter(t => t.employeeId === currentId);
-
-        // 3) Totals
-        this.totalSalary = this.transactions.reduce((s, t) => s + (t.total || 0), 0);
+        // Totals
+        this.totalSalary = this.transactions.reduce((sum, t) => sum + (t.total || 0), 0);
         this.salaryPaid = this.transactions
           .filter(t => (t.status || '').toLowerCase() === 'paid')
-          .reduce((s, t) => s + (t.total || 0), 0);
+          .reduce((sum, t) => sum + (t.total || 0), 0);
         this.salaryPending = this.totalSalary - this.salaryPaid;
 
-        console.log('Filtered transactions:', this.transactions);
+        console.log('Salary transactions:', this.transactions);
       },
       error: (err) => console.error('Error loading salary transactions:', err)
     });
   }
+  // 🔹 Open edit modal when clicking edit
+  editSection(section: string) {
+    if (section === 'basic' && this.employee) {
+      this.basicForm.patchValue({
+        email: this.employee.email,
+        phone: this.employee.phone,
+        position: this.employee.position,
+        departmentId: this.employee.departmentId,
+        fathersName: this.employee.fathersName,
+        aadharNo: this.employee.aadharNo,
+        panCard: this.employee.panCard,
+        gender: this.employee.gender,
+        firstname: this.employee.firstname,
+        lastName: this.employee.lastName,
+        id: this.employee.id,
+        dateOfJoining: this.employee.joiningDate
+          ? this.formatDateToInput(this.employee.joiningDate)
+          : ''
+      });
+
+      const modalEl = document.getElementById('editBasicModal');
+      if (modalEl) {
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+      }
+    } else if (section === 'personal' && this.employee) {
+      this.personalForm.patchValue({
+        fathersName: this.employee.fathersName,
+        aadharNo: this.employee.aadharNo,
+        panCard: this.employee.panCard,
+        dob: this.formatDateToInput(this.employee.dob ?? ''),
+        email: this.employee.email,
+        address: this.employee.address
+      });
+      const modalEl = document.getElementById('editPersonalModal');
+      if (modalEl) {
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+      }
+    }
+  }
+
+
+
+  saveBasicInfo() {
+    if (this.basicForm.invalid) return;
+
+    const updated = { ...this.employee, ...this.basicForm.value };
+
+    // Make sure ID exists
+    if (!updated.id) {
+      console.error('Cannot update employee: ID is missing!', updated);
+      return;
+    }
+
+    this.employeesService.updateEmployee(updated.id, updated).subscribe({
+      next: (res: any) => {
+        if (res.employee) {
+          // Update local employee object
+          this.employee = res.employee;
+
+          // Patch the updated data back into the form
+          this.basicForm.patchValue({
+            email: res.employee.email,
+            phone: res.employee.phone,
+            position: res.employee.position,
+            departmentId: res.employee.departmentId,
+            fathersName: res.employee.fathersName,
+            aadharNo: res.employee.aadharNo,
+            panCard: res.employee.panCard,
+            gender: res.employee.gender,
+            firstname: res.employee.firstname,
+            lastName: res.employee.lastName,
+            dateOfJoining: res.employee.joiningDate
+              ? this.formatDateToInput(res.employee.joiningDate)
+              : ''
+          });
+
+          alert(res.message);
+
+          // Close modal
+          const modalEl = document.getElementById('editBasicModal');
+          if (modalEl) {
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            modalInstance?.hide();
+          }
+
+          // Reload employee details to refresh all bindings
+          this.loadEmployeeDetails(res.employee.id);
+        } else {
+          console.error('No employee returned in response', res);
+        }
+      },
+      error: (err) => {
+        console.error('Update failed', err);
+        alert('Update failed. Check console for details.');
+      }
+    });
+  }
+
+  savePersonalInfo() {
+    if (this.personalForm.invalid) return;
+
+    const updated = { ...this.employee, ...this.personalForm.value };
+
+    // Check for valid ID
+    if (!updated.id) {
+      console.error('Cannot update employee: ID is missing!', updated);
+      return;
+    }
+
+    this.employeesService.updateEmployee(updated.id, updated).subscribe({
+      next: (res: any) => {
+        if (res.employee) {
+          this.employee = res.employee; // Update local object
+          alert(res.message);
+
+          // 🔹 Refresh the employee details from backend
+          this.loadEmployeeDetails(res.employee.id);
+
+          // 🔹 Optional: close modal after save
+          const modalEl = document.getElementById('editPersonalModal');
+          if (modalEl) {
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            modalInstance?.hide();
+          }
+        } else {
+          console.error('No employee returned in response', res);
+        }
+      },
+      error: (err) => {
+        console.error('Update failed', err);
+        alert('Update failed. Check console for details.');
+      }
+    });
+  }
+
+loadSalaryDetails(employeeId: number) {
+  this.employeesService.getSalary(employeeId).subscribe({
+    next: (salary: any) => {
+      if (!salary) return;
+
+      // Use values from database directly
+      this.basicMonthly = salary.basic_monthly ?? 0;
+      this.basicAnnual = salary.basic_annual ?? 0;
+      this.hraMonthly = salary.hra_monthly ?? 0;
+      this.hraAnnual = salary.hra_annual ?? 0;
+
+      this.fixedMonthly = salary.fixed_allowance_monthly ?? 0;
+      this.fixedAnnual = salary.fixed_allowance ?? 0;
+
+      // 🔹 Corrected conveyance mapping
+      this.conveyance = salary.conveyance ?? 0;           // monthly
+      this.conveyance_annual = salary.conveyance_annual ?? 0;
+
+      this.totalMonthly = salary.total_monthly ?? 0;
+      this.totalAnnual = salary.total_annual ?? 0;
+
+      this.basicPercent = salary.basic_percent ?? 0;
+      this.hraPercent = salary.hra_percent ?? 0;
+    },
+    error: (err) => console.error('Salary fetch error:', err)
+  });
+}
+
+sendSalaryCertificateMail(event: Event) {
+  event.preventDefault();
+  if (!this.employee?.id) {
+    alert('Employee not loaded!');
+    return;
+  }
+
+  this.salaryService.sendSalaryCertificate(this.employee.id).subscribe({
+    next: (res: any) => {
+      alert(res.message || 'Salary certificate sent successfully!');
+    },
+    error: (err: any) => {
+      console.error('Error sending salary certificate:', err);
+      alert('Failed to send salary certificate. Check console for details.');
+    }
+  });
+}
+
+  printSalaryCertificate(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!this.employee) {
+      alert('Employee not loaded!');
+      return;
+    }
+
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (!printWindow) {
+      alert('Popup blocked! Please allow popups for this site.');
+      return;
+    }
+
+    printWindow.document.write(`
+    <html>
+      <head>
+        <title>Salary Certificate</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { text-align: center; margin-bottom: 5px; }
+          .date { text-align: right; font-size: 15px; margin-bottom: 20px; }
+          p { font-size: 14px; margin: 4px 0; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+          th { background: #f2f2f2; }
+          .footer-text { margin-top: 20px; font-size: 14px; text-align: justify; }
+        </style>
+      </head>
+      <body>
+        <div class="date">Date: ${formattedDate}</div>
+        <h1>Salary Certificate</h1>
+        <p><strong>Employee Name:</strong> ${this.employee.firstname} ${this.employee.lastName}</p>
+        <p><strong>Employee ID:</strong> ${this.employee.id}</p>
+        <p><strong>Annual CTC:</strong> ₹${this.totalAnnual}</p>
+        <p><strong>Monthly CTC:</strong> ₹${this.totalMonthly}</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>SALARY COMPONENT</th>
+              <th>MONTHLY</th>
+              <th>ANNUAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Basic (${this.basicPercent}%)</td>
+              <td>₹${this.basicMonthly}</td>
+              <td>₹${this.basicAnnual}</td>
+            </tr>
+            <tr>
+              <td>House Rent Allowance (${this.hraPercent}%)</td>
+              <td>₹${this.hraMonthly}</td>
+              <td>₹${this.hraAnnual}</td>
+            </tr>
+            <tr>
+              <td>Fixed Allowance</td>
+              <td>₹${this.fixedMonthly}</td>
+              <td>₹${this.fixedAnnual}</td>
+            </tr>
+            <tr>
+              <td><strong>Total</strong></td>
+              <td>₹${this.totalMonthly}</td>
+              <td>₹${this.totalAnnual}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="footer-text">
+          We hereby confirm that all the above details provided are as per our records. This certificate is being issued upon the
+          request of the above employee for whatever legal purpose it may serve them best.
+        </p>
+      </body>
+    </html>
+  `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  }
+
+
 
 }

@@ -1,0 +1,96 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="main-wrapper mt-5">
+    <div class="page-wrapper">
+        <div class="content">
+
+            <!-- Page Header -->
+            <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
+                <h5 class="fw-bold">Permissions Management</h5>
+                <!-- Only show warning for non-Super Admin -->
+                <p *ngIf="userRole !== 'Super Admin'" class="text-danger">
+                    You do not have permission to access this page.
+                </p>
+            </div>
+
+            <!-- Permissions Table -->
+            <div *ngIf="userRole === 'Super Admin' || users.length > 0">
+                <div class="mb-4">
+                    <h6 class="fw-bold">User Permissions</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>User</th>
+                                    <th>Salary Permission</th>
+                                    <th>Leave Permission</th>
+                                    <th>Employee Permission</th>
+                                    <th>Department Permission</th>
+                                    <th>Attendance Permission</th>
+                                    <th>Report Permission</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let user of users">
+                                    <td>{{ user.name }} ({{ user.roleName }})</td>
+
+                                    <!-- Salary Checkbox -->
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input"
+                                            [checked]="user.can_salary_action === 1" [disabled]="!isSuperAdmin()"
+                                            (change)="toggleSalaryPermission(user.id, $event)">
+
+                                    </td>
+
+                                    <!-- Leave Checkbox -->
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input"
+                                            [checked]="user.can_leave_action === 1"
+                                            [disabled]="userRole !== 'Super Admin'"
+                                            (change)="toggleLeavePermission(user.id, $event)">
+                                    </td>
+
+                                    <!-- Employee Checkbox -->
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input"
+                                            [checked]="user.can_employee_action === 1"
+                                            [disabled]="userRole !== 'Super Admin'"
+                                            (change)="toggleEmployeePermission(user.id, $event)">
+                                    </td>
+
+                                    <!-- Department Checkbox -->
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input"
+                                            [checked]="user.can_department_action === 1"
+                                            [disabled]="userRole !== 'Super Admin'"
+                                            (change)="toggleDepartmentPermission(user.id, $event)">
+                                    </td>
+                                    <!-- Attendance Checkbox -->
+
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input"
+                                            [checked]="user.can_attendance_action === 1"
+                                            [disabled]="userRole !== 'Super Admin'"
+                                            (change)="toggleAttendancePermission(user.id, $event)">
+
+                                    </td>
+
+                                    <!-- Report Checkbox -->
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input"
+                                            [checked]="user.can_report_action === 1" [disabled]="!isSuperAdmin()"
+                                            (change)="toggleReportPermission(user.id, $event)">
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

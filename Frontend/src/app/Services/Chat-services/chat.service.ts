@@ -22,4 +22,12 @@ export class ChatService {
   sendMessage(message: Message): Observable<any> {
     return this.http.post(`${this.backendUrl}/chat/messages`, message);
   }
+
+ deleteMessage(id: number) {
+  return this.http.delete<{ success: boolean; message: string }>(
+    `http://localhost:3000/api/chat/messages/${id}`
+  );
+}
+
+
 }

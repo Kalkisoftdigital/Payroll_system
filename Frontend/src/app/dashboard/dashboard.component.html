@@ -1,850 +1,328 @@
 <app-nav-bar></app-nav-bar>
-<div class="main-wrapper">
-        <div class="page-wrapper">
-            <!-- Start Content -->
-            <div class="content pb-0">
-                <!-- start row -->
-                <div class="row">
-                    <div class="col-lg-8 col-xl-9">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-2">
-                                    <!-- <nav aria-label="breadcrumb">
-                                        <ol class="breadcrumb breadcrumb-divide p-0 mb-0">
-                                            <li class="breadcrumb-item d-flex align-items-center"><a
-                                                    href="index.html">Home</a></li>
-                                            <li class="breadcrumb-item fw-medium active" aria-current="page">Dashboard
-                                             </li>
-                                        </ol>
-                                    </nav> -->
-                                    <h5 class="fw-bold mb-0">Admin Dashboard</h5>
-                                </div>
-                            </div><!-- end card body -->
-                        </div><!-- end card -->
-
-                        <!-- start row -->
-                        <div class="row">
-
-                            <div class="col-md-6 col-xl-3 d-flex">
-                                <div class="card flex-fill">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <div class="avatar avtar-lg bg-teal mb-2"><img
-                                                        src="assets/img/icons/dashboard-card-icon-01.svg"
-                                                        class="w-auto h-auto" alt="Icon"></div>
-                                                <h6 class="fs-14 fw-semibold mb-0">Employees</h6>
-                                            </div>
-                                            <div id="circle_chart_1"></div>
-                                        </div>
-                                    </div><!-- end card body -->
-                                </div><!-- end card -->
-                            </div><!-- end col -->
-
-                            <div class="col-md-6 col-xl-3 d-flex">
-                                <div class="card flex-fill">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <div class="avatar avtar-lg bg-warning mb-2"><img
-                                                        src="assets/img/icons/dashboard-card-icon-01.svg"
-                                                        class="w-auto h-auto" alt="Icon"></div>
-                                                <h6 class="fs-14 fw-semibold mb-0">Companies</h6>
-                                            </div>
-                                            <div id="circle_chart_2"></div>
-                                        </div>
-                                    </div><!-- end card body -->
-                                </div><!-- end card -->
-                            </div><!-- end col -->
-
-                            <div class="col-md-6 col-xl-3 d-flex">
-                                <div class="card flex-fill">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <div class="avatar avtar-lg bg-orange mb-2"><img
-                                                        src="assets/img/icons/dashboard-card-icon-01.svg"
-                                                        class="w-auto h-auto" alt="Icon"></div>
-                                                <h6 class="fs-14 fw-semibold mb-0">Leaves</h6>
-                                            </div>
-                                            <div id="circle_chart_3"></div>
-                                        </div>
-                                    </div><!-- end card body -->
-                                </div><!-- end card -->
-                            </div><!-- end col -->
-
-                            <div class="col-md-6 col-xl-3 d-flex">
-                                <div class="card flex-fill">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <div class="avatar avtar-lg bg-teal mb-2"><img
-                                                        src="assets/img/icons/dashboard-card-icon-01.svg"
-                                                        class="w-auto h-auto" alt="Icon"></div>
-                                                <h6 class="fs-14 fw-semibold mb-0">Salary</h6>
-                                            </div>
-                                            <div id="circle_chart_7"></div>
-                                        </div>
-                                    </div><!-- end card body -->
-                                </div><!-- end card -->
-                            </div><!-- end col -->
-
-                        </div>
-                        <!-- end row -->
-
-                        <!-- start row -->
-                        <div class="row">
-
-                            <div class="col-md-6 col-xl-4 d-flex">
-                                <div class="card flex-fill">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <div class="mb-1">
-                                                    <p class="mb-1 text-dark">Total Applications</p>
-                                                    <h6 class="fs-16 fw-semibold mb-1">5,358</h6>
-                                                </div>
-                                                <p class="fs-12 text-truncate text-dark mb-0"><span
-                                                        class="text-success me-1"><i
-                                                            class="ti ti-trending-up"></i></span>+1.4% from last week
-                                                </p>
-                                            </div>
-                                            <div id="circle_chart_4"></div>
-                                        </div>
-                                    </div><!-- end card body -->
-                                </div><!-- end card -->
-                            </div><!-- end col -->
-
-                            <div class="col-md-6 col-xl-4 d-flex">
-                                <div class="card flex-fill">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <div class="mb-1">
-                                                    <p class="mb-1 text-dark">Total Shortlisted</p>
-                                                    <h6 class="fs-16 fw-semibold mb-1">4,280</h6>
-                                                </div>
-                                                <p class="fs-12 text-truncate text-dark mb-0"><span
-                                                        class="text-success me-1"><i
-                                                            class="ti ti-trending-up"></i></span>+1.4% from last week
-                                                </p>
-                                            </div>
-                                            <div id="circle_chart_5"></div>
-                                        </div>
-                                    </div><!-- end card body -->
-                                </div><!-- end card -->
-                            </div><!-- end col -->
-
-                            <div class="col-md-6 col-xl-4 d-flex">
-                                <div class="card flex-fill">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <div class="mb-1">
-                                                    <p class="mb-1 text-dark">Total Rejected</p>
-                                                    <h6 class="fs-16 fw-semibold mb-1">1078</h6>
-                                                </div>
-                                                <p class="fs-12 text-truncate tex-dark mb-0"><span
-                                                        class="text-success me-1"><i
-                                                            class="ti ti-trending-up"></i></span>+1.4% from last week
-                                                </p>
-                                            </div>
-                                            <div id="circle_chart_6"></div>
-                                        </div>
-                                    </div><!-- end card body -->
-                                </div><!-- end card -->
-                            </div><!-- end col -->
-
-                        </div>
-                        <!-- end row -->
-
-                    </div><!-- end col -->
-
-                    <!-- <div class="col-lg-4 col-xl-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="index-profile text-center">
-                                    <img src="assets/img/users/user-05.jpg" alt="img"
-                                        class="avatar avatar-xxl rounded-circle shadow">
-                                    <div class="text-center mb-0">
-                                        <h5 class="fw-bold mb-1">Welcome Admin</h5>
-                                        <p class="mb-0">17 Apr 2025</p>
-                                    </div>
-                                </div>
-                                <div class="index-profile-links">
-                                    <a href="index.html" class="dashboard-toggle active">Admin Dashboard</a>
-                                    <a href="employee-dashboard.html" class="dashboard-toggle">Employee Dashboard</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                    <!-- end col -->
-
-                </div>
-                <!-- end row -->
-
-                <!-- start row -->
-                <div class="row">
-
-                    <div class="col-md-6 col-xl-4 d-flex">
-                        <div class="card flex-fill">
-                            <div class="card-header">
-                                <h5 class="fw-bold mb-0">Total Employees</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex justify-content-center">
-                                    <div id="polarchart"></div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <h6 class="fs-14 mb-3"><i
-                                                class="ti ti-square-filled text-indigo me-1"></i>Design</h6>
-                                        <h6 class="fs-14 mb-0"><i
-                                                class="ti ti-square-filled text-warning me-1"></i>Development</h6>
-                                    </div>
-                                    <div class="col-6">
-                                        <h6 class="fs-14 mb-3"><i
-                                                class="ti ti-square-filled text-success me-1"></i>Business</h6>
-                                        <h6 class="fs-14 mb-0"><i
-                                                class="ti ti-square-filled text-orange me-1"></i>Testing</h6>
-                                    </div>
-                                </div>
-
-                            </div><!-- end card body -->
-                        </div><!-- end card -->
-                    </div><!-- end col -->
-
-                    <div class="col-md-6 col-xl-5 d-flex">
-                        <div class="card flex-fill">
-                            <div class="card-header">
-                                <h5 class="fw-bold mb-0">Total Applications</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-2">
-                                    <div id="applications_chart"></div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center justify-content-between mb-3">
-                                            <h6 class="fs-14 mb-0"><i
-                                                    class="ti ti-square-filled text-indigo me-1"></i>Total</h6>
-                                            <div class="d-flex">
-                                                <span class="span-divider me-3">5358</span>
-                                                <span>44%</span>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <h6 class="fs-14 mb-0"><i
-                                                    class="ti ti-square-filled text-warning me-1"></i>Shortlisted</h6>
-                                            <div class="d-flex">
-                                                <span class="span-divider me-3">857</span>
-                                                <span>16%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center justify-content-between mb-3">
-                                            <h6 class="fs-14 mb-0"><i
-                                                    class="ti ti-square-filled text-success me-1"></i>Selected </h6>
-                                            <div class="d-flex">
-                                                <span class="span-divider me-3">1714</span>
-                                                <span>32%</span>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <h6 class="fs-14 mb-0"><i
-                                                    class="ti ti-square-filled text-orange me-1"></i>Rejected</h6>
-                                            <div class="d-flex">
-                                                <span class="span-divider me-3">428</span>
-                                                <span>08%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div><!-- end card body -->
-                        </div><!-- end card -->
-                    </div><!-- end col -->
-
-                    <div class="col-md-12 col-xl-3 d-flex">
-                        <div class="card flex-fill">
-                            <div class="card-header">
-                                <h5 class="fw-bold mb-0">Employee Strucuture</h5>
-                            </div>
-                            <div class="card-body">
-                                <div
-                                    class="d-flex d-xl-block align-items-center justify-content-center flex-wrap text-center">
-                                    <div>
-                                        <div id="chart_male"></div>
-                                        <p class="text-center fw-semibold text-dark mb-0">Male</p>
-                                    </div>
-                                    <div>
-                                        <div id="chart_female"></div>
-                                        <p class="text-center fw-semibold text-dark mb-0">Female</p>
-                                    </div>
-                                </div>
-                            </div><!-- end card body -->
-                        </div><!-- end card -->
-                    </div><!-- end col -->
-
-                </div>
-                <!-- end row -->
-
-                <!-- start row -->
-                <div class="row">
-
-                    <div class="col-lg-5 d-flex">
-                        <div class="card shadow flex-fill">
-                            <div class="card-header d-flex align-items-center justify-content-between">
-                                <h6 class="fw-bold mb-0">Recent Activities</h6>
-                                <a href="#" class="btn btn-sm btn-icon btn-outline-white border-0"><i
-                                        class="ti ti-refresh"></i></a>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <a href="employee-details.html"
-                                            class="avatar avatar-sm avatar-rounded flex-shrink-0">
-                                            <img src="assets/img/employees/employee-01.jpg" alt="img">
-                                        </a>
-                                        <div class="ms-2">
-                                            <h6 class="fs-14 mb-1"><a href="employee-details.html">John Carter</a></h6>
-                                            <p class="fs-13 mb-0 text-truncate">Added New Project HRMS Dashboard</p>
-                                        </div>
-                                    </div>
-                                    <span class="badge badge-soft-primary"><i class="ti ti-clock-hour-3 me-1"></i>06:20
-                                        PM</span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <a href="employee-details.html"
-                                            class="avatar avatar-sm avatar-rounded flex-shrink-0">
-                                            <img src="assets/img/employees/employee-02.jpg" alt="img">
-                                        </a>
-                                        <div class="ms-2">
-                                            <h6 class="fs-14 mb-1"><a href="employee-details.html">Sophia White</a></h6>
-                                            <p class="fs-13 mb-0 text-truncate">Commented on Uploaded Document</p>
-                                        </div>
-                                    </div>
-                                    <span class="badge badge-soft-primary"><i class="ti ti-clock-hour-3 me-1"></i>04:00
-                                        PM</span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <a href="employee-details.html"
-                                            class="avatar avatar-sm avatar-rounded flex-shrink-0">
-                                            <img src="assets/img/employees/employee-03.jpg" alt="img">
-                                        </a>
-                                        <div class="ms-2">
-                                            <h6 class="fs-14 mb-1"><a href="employee-details.html">Michael Johnson</a>
-                                            </h6>
-                                            <p class="fs-13 mb-0 text-truncate">Approved Task Projects</p>
-                                        </div>
-                                    </div>
-                                    <span class="badge badge-soft-primary"><i class="ti ti-clock-hour-3 me-1"></i>02:30
-                                        PM</span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <a href="employee-details.html"
-                                            class="avatar avatar-sm avatar-rounded flex-shrink-0">
-                                            <img src="assets/img/employees/employee-04.jpg" alt="img">
-                                        </a>
-                                        <div class="ms-2">
-                                            <h6 class="fs-14 mb-1"><a href="employee-details.html">Emily Clark</a></h6>
-                                            <p class="fs-13 mb-0 text-truncate">Requesting Access to Module Tickets</p>
-                                        </div>
-                                    </div>
-                                    <span class="badge badge-soft-primary"><i class="ti ti-clock-hour-3 me-1"></i>12:10
-                                        PM</span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <a href="employee-details.html"
-                                            class="avatar avatar-sm avatar-rounded flex-shrink-0">
-                                            <img src="assets/img/employees/employee-05.jpg" alt="img">
-                                        </a>
-                                        <div class="ms-2">
-                                            <h6 class="fs-14 mb-1"><a href="employee-details.html">David Anderson</a>
-                                            </h6>
-                                            <p class="fs-13 mb-0 text-truncate">Downloaded App Reports</p>
-                                        </div>
-                                    </div>
-                                    <span class="badge badge-soft-primary"><i class="ti ti-clock-hour-3 me-1"></i>10:40
-                                        AM</span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center">
-                                        <a href="employee-details.html"
-                                            class="avatar avatar-sm avatar-rounded flex-shrink-0">
-                                            <img src="assets/img/employees/employee-06.jpg" alt="img">
-                                        </a>
-                                        <div class="ms-2">
-                                            <h6 class="fs-14 mb-1"><a href="employee-details.html">Olivia Haris</a></h6>
-                                            <p class="fs-13 mb-0 text-truncate">Completed ticket module in HRMS</p>
-                                        </div>
-                                    </div>
-                                    <span class="badge badge-soft-primary"><i class="ti ti-clock-hour-3 me-1"></i>09:50
-                                        AM</span>
-                                </div>
-                            </div> <!-- end card body -->
-                        </div> <!-- end card -->
-                    </div><!-- end col -->
-
-                    <div class="col-lg-7 d-flex">
-                        <div class="card shadow flex-fill">
-                            <div class="card-header d-flex align-items-center justify-content-between">
-                                <h6 class="fw-bold mb-0">Team Leads</h6>
-                                <a href="manage-team-lead.html" class="btn btn-sm btn-outline-white">Manage Team</a>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-nowrap border">
-                                        <thead>
-                                            <tr>
-                                                <th>Lead Name</th>
-                                                <th>Team</th>
-                                                <th>Email</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="employee-details.html"
-                                                            class="avatar avatar-sm avatar-rounded">
-                                                            <img src="assets/img/employees/employee-03.jpg" alt="img">
-                                                        </a>
-                                                        <div class="ms-2">
-                                                            <h6 class="fs-14 mb-0"><a href="employee-details.html">Braun
-                                                                    Kelton</a></h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td><span class="badge badge-md badge-soft-teal">PHP</span></td>
-                                                <td><a href="https://dleohr.dreamstechnologies.com/cdn-cgi/l/email-protection"
-                                                        class="__cf_email__"
-                                                        data-cfemail="197b6b786c77597c61787469757c377a7674">[email&#160;protected]</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="employee-details.html"
-                                                            class="avatar avatar-sm avatar-rounded">
-                                                            <img src="assets/img/employees/employee-06.jpg" alt="img">
-                                                        </a>
-                                                        <div class="ms-2">
-                                                            <h6 class="fs-14 mb-0"><a href="employee-details.html">Sarah
-                                                                    Michelle</a></h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td><span class="badge badge-md badge-soft-pink">IOS</span></td>
-                                                <td><a href="https://dleohr.dreamstechnologies.com/cdn-cgi/l/email-protection"
-                                                        class="__cf_email__"
-                                                        data-cfemail="9fecfeedfef7dffae7fef2eff3fab1fcf0f2">[email&#160;protected]</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="employee-details.html"
-                                                            class="avatar avatar-sm avatar-rounded">
-                                                            <img src="assets/img/managers/manager-07.jpg" alt="img">
-                                                        </a>
-                                                        <div class="ms-2">
-                                                            <h6 class="fs-14 mb-0"><a
-                                                                    href="employee-details.html">Daniel Patrick</a></h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td><span class="badge badge-md badge-soft-orange">HTML</span></td>
-                                                <td><a href="https://dleohr.dreamstechnologies.com/cdn-cgi/l/email-protection"
-                                                        class="__cf_email__"
-                                                        data-cfemail="7c181d121519103c19041d110c1019521f1311">[email&#160;protected]</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="javascript:void(0);"
-                                                            class="avatar avatar-sm avatar-rounded">
-                                                            <img src="assets/img/employees/employee-08.jpg" alt="img">
-                                                        </a>
-                                                        <div class="ms-2">
-                                                            <h6 class="fs-14 mb-0"><a href="javascript:void(0);">Emily
-                                                                    Clark</a></h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td><span class="badge badge-md badge-soft-success">UI/UX</span></td>
-                                                <td><a href="https://dleohr.dreamstechnologies.com/cdn-cgi/l/email-protection"
-                                                        class="__cf_email__"
-                                                        data-cfemail="690c04000510290c11080419050c470a0604">[email&#160;protected]</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="employee-details.html"
-                                                            class="avatar avatar-sm avatar-rounded">
-                                                            <img src="assets/img/managers/manager-05.jpg" alt="img">
-                                                        </a>
-                                                        <div class="ms-2">
-                                                            <h6 class="fs-14 mb-0"><a href="employee-details.html">Ryan
-                                                                    Christopher</a></h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td><span class="badge badge-md badge-soft-info">React</span></td>
-                                                <td><a href="https://dleohr.dreamstechnologies.com/cdn-cgi/l/email-protection"
-                                                        class="__cf_email__"
-                                                        data-cfemail="2f5d564e416f4a574e425f434a014c4042">[email&#160;protected]</a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div> <!-- end card body -->
-                        </div> <!-- end card -->
-                    </div><!-- end col -->
-
-                    <div class="col-lg-7 d-flex">
-                        <div class="card shadow flex-fill">
-                            <div class="card-header d-flex align-items-center justify-content-between">
-                                <h6 class="fw-bold mb-0">Upcoming Leaves</h6>
-                                <a href="leaves.html" class="btn btn-sm btn-outline-white">Manage Leave</a>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-nowrap border">
-                                        <thead>
-                                            <tr>
-                                                <th>Employee</th>
-                                                <th>Date</th>
-                                                <th>Type</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="employee-details.html"
-                                                            class="avatar avatar-sm avatar-rounded">
-                                                            <img src="assets/img/employees/employee-09.jpg" alt="img">
-                                                        </a>
-                                                        <div class="ms-2">
-                                                            <h6 class="fs-14 mb-0"><a
-                                                                    href="employee-details.html">Daniel Martinz</a></h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>17 Apr 2025</td>
-                                                <td><span class="badge badge-md badge-soft-teal">Sick Leave</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="employee-details.html"
-                                                            class="avatar avatar-sm avatar-rounded">
-                                                            <img src="assets/img/employees/employee-04.jpg" alt="img">
-                                                        </a>
-                                                        <div class="ms-2">
-                                                            <h6 class="fs-14 mb-0"><a href="employee-details.html">Emily
-                                                                    Clark</a></h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>20 Apr 2025</td>
-                                                <td><span class="badge badge-md badge-soft-primary">Casual Leave</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="employee-details.html"
-                                                            class="avatar avatar-sm avatar-rounded">
-                                                            <img src="assets/img/managers/manager-03.jpg" alt="img">
-                                                        </a>
-                                                        <div class="ms-2">
-                                                            <h6 class="fs-14 mb-0"><a
-                                                                    href="employee-details.html">Daniel Patrick</a></h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>22 Apr 2025</td>
-                                                <td><span class="badge badge-md badge-soft-orange">Annual Leave</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="javascript:void(0);"
-                                                            class="avatar avatar-sm avatar-rounded">
-                                                            <img src="assets/img/employees/employee-02.jpg" alt="img">
-                                                        </a>
-                                                        <div class="ms-2">
-                                                            <h6 class="fs-14 mb-0"><a href="javascript:void(0);">Sophia
-                                                                    White</a></h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>28 Apr 2025</td>
-                                                <td><span class="badge badge-md badge-soft-teal">Sick Leave</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="employee-details.html"
-                                                            class="avatar avatar-sm avatar-rounded">
-                                                            <img src="assets/img/managers/manager-09.jpg" alt="img">
-                                                        </a>
-                                                        <div class="ms-2">
-                                                            <h6 class="fs-14 mb-0"><a
-                                                                    href="employee-details.html">Madison Andrew</a></h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>30 Apr 2025</td>
-                                                <td><span class="badge badge-md badge-soft-primary">Casual Leave</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div> <!-- end card body -->
-                        </div> <!-- end card -->
-                    </div><!-- end col -->
-
-                    <div class="col-lg-5 d-flex">
-                        <div class="card shadow flex-fill">
-                            <div class="card-header d-flex align-items-center justify-content-between">
-                                <h6 class="mb-0 fw-bold">Today</h6>
-                                <a href="#" class="btn btn-sm btn-icon btn-outline-white border-0"><i
-                                        class="ti ti-refresh"></i></a>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <span
-                                            class="avatar avatar-sm bg-soft-primary rounded-circle text-primary flex-shrink-0 me-2">
-                                            <i class="ti ti-cake fs-16"></i>
-                                        </span>
-                                        <p class="mb-0">Daniel Martinz’s Birthday</p>
-                                    </div>
-                                    <span class="avatar avatar-sm avatar-rounded"><img
-                                            src="assets/img/employees/employee-10.jpg" alt=""></span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <span
-                                            class="avatar avatar-sm bg-soft-primary rounded-circle text-primary flex-shrink-0 me-2">
-                                            <i class="ti ti-cake fs-16"></i>
-                                        </span>
-                                        <p class="mb-0">Amelia Curr’s Birthday</p>
-                                    </div>
-                                    <span class="avatar avatar-sm avatar-rounded"><img
-                                            src="assets/img/employees/employee-09.jpg" alt=""></span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <span
-                                            class="avatar avatar-sm bg-soft-primary rounded-circle text-primary flex-shrink-0 me-2">
-                                            <i class="ti ti-cake fs-16"></i>
-                                        </span>
-                                        <p class="mb-0">Emma Lewis’s Birthday</p>
-                                    </div>
-                                    <span class="avatar avatar-sm avatar-rounded"><img
-                                            src="assets/img/employees/employee-08.jpg" alt=""></span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <span
-                                            class="avatar avatar-sm bg-soft-secondary rounded-circle text-secondary flex-shrink-0 me-2">
-                                            <i class="ti ti-calendar-star fs-16"></i>
-                                        </span>
-                                        <p class="mb-0">Madison Andrew is off sick today</p>
-                                    </div>
-                                    <span class="avatar avatar-sm avatar-rounded"><img
-                                            src="assets/img/managers/manager-09.jpg" alt=""></span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <span
-                                            class="avatar avatar-sm bg-soft-secondary rounded-circle text-secondary flex-shrink-0 me-2">
-                                            <i class="ti ti-calendar-star fs-16"></i>
-                                        </span>
-                                        <p class="mb-0">Victoria Celestie is off sick today</p>
-                                    </div>
-                                    <span class="avatar avatar-sm avatar-rounded"><img
-                                            src="assets/img/managers/manager-10.jpg" alt=""></span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <span
-                                            class="avatar avatar-sm bg-soft-secondary rounded-circle text-secondary flex-shrink-0 me-2">
-                                            <i class="ti ti-calendar-star fs-16"></i>
-                                        </span>
-                                        <p class="mb-0">Daniel Patrick is off sick today</p>
-                                    </div>
-                                    <span class="avatar avatar-sm avatar-rounded"><img
-                                            src="assets/img/managers/manager-03.jpg" alt=""></span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center">
-                                        <span
-                                            class="avatar avatar-sm bg-soft-secondary rounded-circle text-secondary flex-shrink-0 me-2">
-                                            <i class="ti ti-calendar-star fs-16"></i>
-                                        </span>
-                                        <p class="mb-0">Jessica Renee is off sick today</p>
-                                    </div>
-                                    <span class="avatar avatar-sm avatar-rounded"><img
-                                            src="assets/img/managers/manager-06.jpg" alt=""></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div><!-- end col -->
-
-                    <div class="col-xl-5 d-flex">
-                        <div class="card shadow flex-fill">
-                            <div class="card-header d-flex align-items-center justify-content-between">
-                                <h6 class="fw-bold mb-0">To Do List</h6>
-                                <a href="todo-list.html" class="btn btn-sm btn-outline-white">View All</a>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <input type="checkbox" id="check_1" class="form-check-input me-2" checked>
-                                        <label for="check_1">
-                                            <span class="d-flex align-items-center mb-1">
-                                                <span
-                                                    class="fs-14 fw-semibold text-dark text-decoration-line-through me-2">New
-                                                    Employee Intro</span>
-                                                <span class="badge badge-md badge-soft-danger">High</span>
-                                            </span>
-                                            <span class="fs-13 mb-0">Scheduled for 04:00 PM on 18 Apr 2025</span>
-                                        </label>
-                                    </div>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-outline-white"
-                                        data-bs-toggle="modal" data-bs-target="#delete_modal"><i
-                                            class="ti ti-trash"></i></a>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <input type="checkbox" id="check_2" class="form-check-input me-2">
-                                        <label for="check_2">
-                                            <span class="d-flex align-items-center mb-1">
-                                                <span class="fs-14 fw-semibold text-dark me-2">New Employee Intro</span>
-                                                <span class="badge badge-md badge-soft-info">Medium</span>
-                                            </span>
-                                            <span class="fs-13 mb-0">Scheduled for 04:00 PM on 18 Apr 2025</span>
-                                        </label>
-                                    </div>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-outline-white"
-                                        data-bs-toggle="modal" data-bs-target="#delete_modal"><i
-                                            class="ti ti-trash"></i></a>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <input type="checkbox" id="check_3" class="form-check-input me-2">
-                                        <label for="check_3">
-                                            <span class="d-flex align-items-center mb-1">
-                                                <span class="fs-14 fw-semibold text-dark me-2">New Employee Intro</span>
-                                                <span class="badge badge-md badge-soft-success">Low</span>
-                                            </span>
-                                            <span class="fs-13 mb-0">Scheduled for 04:00 PM on 18 Apr 2025</span>
-                                        </label>
-                                    </div>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-outline-white"
-                                        data-bs-toggle="modal" data-bs-target="#delete_modal"><i
-                                            class="ti ti-trash"></i></a>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <input type="checkbox" id="check_4" class="form-check-input me-2">
-                                        <label for="check_4">
-                                            <span class="d-flex align-items-center mb-1">
-                                                <span class="fs-14 fw-semibold text-dark me-2">New Employee Intro</span>
-                                                <span class="badge badge-md badge-soft-danger">High</span>
-                                            </span>
-                                            <span class="fs-13 mb-0">Scheduled for 04:00 PM on 18 Apr 2025</span>
-                                        </label>
-                                    </div>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-outline-white"
-                                        data-bs-toggle="modal" data-bs-target="#delete_modal"><i
-                                            class="ti ti-trash"></i></a>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                    <div class="d-flex align-items-center">
-                                        <input type="checkbox" id="check_5" class="form-check-input me-2">
-                                        <label for="check_5">
-                                            <span class="d-flex align-items-center mb-1">
-                                                <span class="fs-14 fw-semibold text-dark me-2">New Employee Intro</span>
-                                                <span class="badge badge-md badge-soft-info">Medium</span>
-                                            </span>
-                                            <span class="fs-13 mb-0">Scheduled for 04:00 PM on 18 Apr 2025</span>
-                                        </label>
-                                    </div>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm btn-outline-white"
-                                        data-bs-toggle="modal" data-bs-target="#delete_modal"><i
-                                            class="ti ti-trash"></i></a>
-                                </div>
-                            </div> <!-- end card body -->
-                        </div> <!-- end card -->
-                    </div><!-- end col -->
-
-                    <div class="col-xl-7">
-                        <div class="card shadow">
-                            <div class="card-header">
-                                <h6 class="fw-bold mb-0">Total Salary By Unit</h6>
-                            </div>
-                            <div class="card-body">
-                                <div id="salary-chart"></div>
-                            </div> <!-- end card body -->
-                        </div> <!-- end card -->
-                    </div><!-- end col -->
-
-                </div>
-                <!-- end row -->
-
+<div class="main-wrapper mt-5">
+  <div class="page-wrapper">
+    <div class="content pb-0">
+      <!-- Title -->
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <h5 class="fw-bold mb-0">Admin Dashboard</h5>
+              <div *ngIf="loading" class="text-muted small">Loading data…</div>
+              <div *ngIf="!loading && errorMsg" class="text-danger small">{{ errorMsg }}</div>
             </div>
-            <!-- End Content -->
-
-            <!-- Footer Start -->
-            <!-- <div
-                class="footer d-flex align-items-center justify-content-between flex-column flex-sm-row row-gap-2 border-top py-2 px-3">
-                <p class="text-dark mb-0">2025 &copy; <a href="javascript:void(0);" class="link-primary">Dleo HR</a>,
-                    All Rights Reserved</p>
-                <p class="text-dark mb-0">Design & Developed by <a href="https://dreamstechnologies.com/"
-                        target="_blank" class="link-primary">Dreams Technologies</a></p>
-            </div> -->
-            <!-- Footer End -->
-
+          </div>
         </div>
+      </div>
 
-        <!-- ========================
-			End Page Content
-		========================= -->
+      <!-- Add Company Card -->
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="card shadow-sm text-center hover-shadow transition-all" style="cursor:pointer"
+            (click)="toggleCompanyForm()">
+            <div class="card-body">
+              <i class="fas fa-building fa-2x mb-2"></i>
+              <h5 class="fw-bold">Add Company Details</h5>
+              <small>Click here to add your company info</small>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <!-- Start Modal  -->
-        <div class="modal fade" id="delete_modal">
-            <div class="modal-dialog modal-dialog-centered modal-sm">
-                <div class="modal-content">
-                    <div class="modal-body text-center">
-                        <div class="mb-3">
-                            <span class="avatar bg-danger"><i class="ti ti-trash fs-24"></i></span>
-                        </div>
-                        <h6 class="mb-1">Delete Confirmation</h6>
-                        <p class="mb-3">Are you sure want to delete todo?</p>
-                        <div class="d-flex justify-content-center">
-                            <a href="javascript:void(0);" class="btn btn-outline-white w-100 me-2"
-                                data-bs-dismiss="modal">Cancel</a>
-                            <a href="index.html" class="btn btn-danger w-100">Yes, Delete</a>
-                        </div>
+      <!-- Company Form Modal -->
+      <div class="modal fade" [ngClass]="{'show d-block': showCompanyForm}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Large modal -->
+          <div class="modal-content shadow-lg rounded-3 border-0">
+
+            <!-- Header -->
+            <div class="modal-header  text-white">
+              <h5 class="modal-title fw-bold">Company Details</h5>
+              <button type="button" class="btn-close btn-close-white" (click)="toggleCompanyForm()"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4">
+              <form [formGroup]="companyForm" (ngSubmit)="submitCompanyForm()">
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Company Name *</label>
+                  <input type="text" class="form-control form-control-lg" formControlName="name">
+                  <div *ngIf="f['name'].touched && f['name'].invalid" class="text-danger small">Name is required</div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Logo</label>
+                  <input type="file" class="form-control" (change)="onLogoChange($event)">
+                  <div *ngIf="logoPreview" class="mt-2">
+                    <img [src]="logoPreview" alt="Logo Preview" class="img-thumbnail shadow-sm"
+                      style="height:80px; border-radius:8px;">
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Address *</label>
+                  <textarea class="form-control form-control-lg" formControlName="address" rows="2"></textarea>
+                  <div *ngIf="f['address'].touched && f['address'].invalid" class="text-danger small">Address is
+                    required</div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Email</label>
+                  <input type="email" class="form-control form-control-lg" formControlName="email">
+                  <div *ngIf="f['email'].touched && f['email'].invalid" class="text-danger small">Invalid email</div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Phone</label>
+                  <input type="text" class="form-control form-control-lg" formControlName="phone">
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Website</label>
+                  <input type="text" class="form-control form-control-lg" formControlName="website">
+                </div>
+
+                <!-- Buttons -->
+                <div class="text-end mt-4">
+                  <button type="button" class="btn btn-outline-secondary me-2" (click)="toggleCompanyForm()">
+                    Cancel
+                  </button>
+                  <button type="submit" class="btn btn-primary" [disabled]="submitting">
+                    {{ submitting ? 'Submitting...' : 'Submit' }}
+                  </button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Backdrop -->
+      <div class="modal-backdrop fade show" *ngIf="showCompanyForm"></div>
+
+      <!-- KPI Cards -->
+      <div class="row g-3">
+        <div *ngFor="let card of statCards" class="col-sm-6 col-md-4 d-flex">
+          <div class="card flex-fill shadow-sm hover-shadow transition-all" (click)="navigateToCard(card)">
+            <div class="kpi-icon mb-3">
+              <i *ngIf="card.title==='Employees'" class="fas fa-user"></i>
+              <i *ngIf="card.title==='Leaves'" class="fas fa-calendar-check"></i>
+              <i *ngIf="card.title==='Salary Records'" class="fas fa-coins"></i>
+              <i *ngIf="card.title==='Departments'" class="fas fa-building"></i>
+              <i *ngIf="card.title==='Teams'" class="fas fa-users"></i>
+              <i *ngIf="card.title==='Reports'" class="fas fa-chart-line"></i>
+            </div>
+            <div class="card-body text-center">
+              <h6>{{ card.title }}</h6>
+              <h4>{{ card.value }}</h4>
+
+              <div *ngIf="card.subCards && activeSubCardTitle === card.title" class="row mt-2 g-2">
+                <div *ngFor="let sub of card.subCards" class="col-4">
+                  <div class="card p-2 text-center shadow-sm hover-shadow transition-all ripple"
+                    [ngStyle]="{'background-color': sub.color || '#f8f9fa', 'color': sub.color ? '#fff' : '#000'}"
+                    (click)="navigateToSubCard(card, sub); $event.stopPropagation()">
+                    <div class="subcard-icon mb-1">
+                      <i *ngIf="sub.title==='Approved'" class="fas fa-check-circle"></i>
+                      <i *ngIf="sub.title==='Pending'" class="fas fa-hourglass-half"></i>
+                      <i *ngIf="sub.title==='Rejected'" class="fas fa-times-circle"></i>
                     </div>
+                    <small>{{ sub.title }}</small>
+                    <div class="fw-bold">{{ sub.value }}</div>
+                  </div>
                 </div>
+              </div>
+
             </div>
+          </div>
         </div>
-        <!-- End Modal  -->
+      </div>
+
+      <!-- Charts Row -->
+      <div class="row g-3 mt-3">
+        <div class="col-lg-6">
+          <div class="card flex-fill shadow-sm">
+            <div class="card-header">
+              <h6 class="fw-bold mb-0">Team Distribution</h6>
+            </div>
+            <div class="card-body">
+              <apx-chart *ngIf="teamPieChartOptions.series?.length" [series]="teamPieChartOptions.series"
+                [chart]="teamPieChartOptions.chart" [labels]="teamPieChartOptions.labels || []"
+                [responsive]="teamPieChartOptions.responsive || []" [colors]="teamPieChartOptions.colors || []">
+              </apx-chart>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card flex-fill shadow-sm">
+            <div class="card-header">
+              <h6 class="fw-bold mb-0">Employees / Departments / Teams</h6>
+            </div>
+            <div class="card-body">
+              <apx-chart *ngIf="pieChartOptions.series?.length" [series]="pieChartOptions.series"
+                [chart]="pieChartOptions.chart" [labels]="pieChartOptions.labels || []"
+                [responsive]="pieChartOptions.responsive || []" [colors]="pieChartOptions.colors || []">
+              </apx-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gender Distribution -->
+      <div class="col-md-6 mt-3">
+        <div class="card flex-fill shadow-sm">
+          <div class="card-header">
+            <h6 class="fw-bold mb-0">Gender Distribution</h6>
+          </div>
+          <apx-chart *ngIf="genderDonutChartOptions?.series?.length" [series]="genderDonutChartOptions.series"
+            [chart]="genderDonutChartOptions.chart" [labels]="genderDonutChartOptions.labels || []"
+            [responsive]="genderDonutChartOptions.responsive || []" [colors]="genderDonutChartOptions.colors || []"
+            [legend]="genderDonutChartOptions.legend">
+          </apx-chart>
+        </div>
+      </div>
+
+      <!-- Salary Line Chart -->
+      <div class="row g-3 mt-3">
+        <div class="col-12">
+          <div class="card flex-fill shadow-sm">
+            <div class="card-header">
+              <h6 class="fw-bold mb-0">Salary Trends</h6>
+            </div>
+            <div class="card-body">
+              <apx-chart *ngIf="lineChartOptions.series?.length" [series]="lineChartOptions.series"
+                [chart]="lineChartOptions.chart" [xaxis]="lineChartOptions.xaxis!" [title]="lineChartOptions.title!"
+                [stroke]="lineChartOptions.stroke!" [tooltip]="lineChartOptions.tooltip">
+              </apx-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Attendance Section -->
+      <!-- Employee Attendance Section -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+          <div class="text-center mb-3"
+            *ngIf="authService.hasPermission('can_attendance_action') || authService.isSuperAdmin()">
+            <h6 class="fw-bold mb-2">Employee Attendance</h6>
+            <button class="btn btn-primary btn-sm" (click)="toggleAddForm()">
+              <i class="ti ti-plus"></i> Add Attendance
+            </button>
+          </div>
+
+
+          <div *ngIf="showAddForm" class="card p-4 shadow-sm mb-4">
+            <h5 class="fw-bold mb-4 text-primary">Add Employee Attendance</h5>
+            <form (ngSubmit)="saveAttendance()" #attendanceForm="ngForm">
+              <!-- Row 1: Employee, Date, In, Out -->
+              <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                  <label class="form-label">Employee</label>
+                  <select class="form-select" name="employeeId" [(ngModel)]="attendance.employeeId" required>
+                    <option value="" disabled selected>Select Employee</option>
+                    <option *ngFor="let emp of employees" [ngValue]="emp.id">
+                      {{ emp.firstname }} {{ emp.lastName }}
+                    </option>
+
+                  </select>
+
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Date</label>
+                  <input type="date" class="form-control" name="date" [(ngModel)]="attendance.date" required />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">In Time</label>
+                  <input type="time" class="form-control" name="inTime" [(ngModel)]="attendance.inTime" required />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Out Time</label>
+                  <input type="time" class="form-control" name="outTime" [(ngModel)]="attendance.outTime" />
+                </div>
+              </div>
+
+              <!-- Row 2: Shift, Late Mark -->
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label">Shift</label>
+                  <select class="form-select" name="shift" [(ngModel)]="attendance.shift">
+                    <option value="Morning">Morning</option>
+                    <option value="Evening">Evening</option>
+                    <option value="Night">Night</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Late Mark</label>
+                  <select class="form-select" name="lateMark" [(ngModel)]="attendance.lateMark">
+                    <option [ngValue]="false">No</option>
+                    <option [ngValue]="true">Yes</option>
+                  </select>
+
+                </div>
+              </div>
+
+              <!-- Buttons -->
+              <div class="mt-4 d-flex justify-content-end">
+                <button class="btn btn-success me-2" type="submit">Save</button>
+                <button class="btn btn-outline-secondary" type="button" (click)="toggleAddForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+
+
+        </div>
+      </div>
+
+      <!-- Upcoming Leaves -->
+      <div class="row g-3 mt-3">
+        <div class="col-12">
+          <div class="card flex-fill shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="fw-bold mb-0">Upcoming Leaves</h6>
+              <input type="text" class="form-control form-control-sm w-auto" placeholder="Search employee/type"
+                [(ngModel)]="leaveSearchTerm">
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-nowrap border align-middle">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let leave of filteredLeaves()">
+                      <td>
+                        <div class="fw-semibold">{{ leave.employee?.firstname || 'Unknown' }} {{
+                          leave.employee?.lastName || '' }}</div>
+                        <small class="text-muted">{{ leave.employee?.team || leave.employee?.role || 'N/A' }}</small>
+                      </td>
+                      <td>{{ leave.start_date | date:'dd MMM yyyy' }} → {{ leave.end_date | date:'dd MMM yyyy' }}</td>
+                      <td>{{ leave.leave_type }}</td>
+                      <td>
+                        <span [ngClass]="{
+  'text-success': leave.status.toLowerCase() === 'approved',
+  'text-warning': leave.status.toLowerCase() === 'pending',
+  'text-danger': leave.status.toLowerCase() === 'rejected'
+}">{{ leave.status }}</span>
+                      </td>
+                    </tr>
+                    <tr *ngIf="!filteredLeaves().length && !loading">
+                      <td colspan="4" class="text-center text-muted">No upcoming leaves</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
+  </div>
+</div>

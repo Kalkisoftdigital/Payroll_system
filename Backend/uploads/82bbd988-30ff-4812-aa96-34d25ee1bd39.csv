@@ -1,0 +1,4 @@
+empId,empName,department,date,checkIn,checkOut,status
+1,Akash Patil,IT,2025-09-20,09:00:00,18:00:00,Present
+2,Rahul Sharma,HR,2025-09-20,09:30:00,18:30:00,Absent
+3,Priya Desai,Sales,2025-09-20,10:00:00,19:00:00,Leave

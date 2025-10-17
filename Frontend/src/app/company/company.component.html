@@ -1,0 +1,148 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="main-wrapper mt-5">
+  <div class="page-wrapper">
+    <div class="content">
+
+      <!-- Page Header -->
+      <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
+        <div class="flex-grow-1">
+          <h5 class="fw-bold">Company</h5>
+        </div>
+        <div>
+          <button class="btn btn-primary" (click)="openCompanyModal()">
+            <i class="ti ti-circle-plus me-1"></i>New Company
+          </button>
+        </div>
+      </div>
+
+      <!-- Company Table -->
+      <div class="table-responsive">
+        <table class="table table-nowrap datatable">
+          <thead>
+            <tr>
+              <th>Sr.No</th>
+              <th>Company Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th class="no-sort">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let company of companies; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ company.name }}</td>
+              <td>{{ company.email || '-' }}</td>
+              <td>{{ company.phone || '-' }}</td>
+              <td><span class="badge bg-success">Active</span></td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <button class="btn btn-sm btn-primary me-2" (click)="editCompany(company)"
+                    [class.disabled]="!canCompanyAction">Edit</button>
+                  <button class="btn btn-sm btn-danger" (click)="confirmDelete(company.id!)"
+                    [class.disabled]="!canCompanyAction" data-bs-toggle="modal" data-bs-target="#delete_modal">
+                    <i class="ti ti-trash"></i> Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="!companies.length && !loading">
+              <td colspan="6" class="text-center text-muted">No companies added yet</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Company Modal -->
+<div class="modal fade" [ngClass]="{'show d-block': showCompanyForm}" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content shadow-lg rounded-3 border-0">
+
+      <!-- Modal Header -->
+      <div class="modal-header text-white">
+        <h5 class="modal-title fw-bold">{{ selectedCompanyId ? 'Edit Company' : 'Add Company' }}</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="toggleCompanyForm()"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-4">
+        <form [formGroup]="companyForm" (ngSubmit)="submitCompanyForm()">
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Company Name *</label>
+            <input type="text" class="form-control form-control-lg" formControlName="name">
+            <div *ngIf="f['name'].touched && f['name'].invalid" class="text-danger small">Name is required</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Logo</label>
+            <input type="file" class="form-control" (change)="onLogoChange($event)">
+            <div *ngIf="logoPreview" class="mt-2">
+              <img [src]="logoPreview" alt="Logo Preview" class="img-thumbnail shadow-sm"
+                style="height:80px; border-radius:8px;">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Address *</label>
+            <textarea class="form-control form-control-lg" formControlName="address" rows="2"></textarea>
+            <div *ngIf="f['address'].touched && f['address'].invalid" class="text-danger small">Address is required</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email</label>
+            <input type="email" class="form-control form-control-lg" formControlName="email">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Phone</label>
+            <input type="text" class="form-control form-control-lg" formControlName="phone">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Website</label>
+            <input type="text" class="form-control form-control-lg" formControlName="website">
+          </div>
+
+          <div class="text-end mt-4">
+            <button type="button" class="btn btn-outline-secondary me-2" (click)="toggleCompanyForm()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="submitting">
+              {{ submitting ? 'Submitting...' : 'Submit' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade show" *ngIf="showCompanyForm"></div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="delete_modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <div class="mb-3">
+          <span class="avatar bg-danger">
+            <i class="ti ti-trash fs-24 text-white"></i>
+          </span>
+        </div>
+        <h6 class="mb-1">Delete Confirmation</h6>
+        <p class="mb-3">Are you sure you want to delete this company?</p>
+        <div class="d-flex justify-content-center">
+          <button class="btn btn-outline-white w-100 me-2" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-danger w-100" (click)="deleteCompany()">Yes, Delete</button>
+        </div>
+        <button id="closeDeleteModalBtn" class="d-none" data-bs-dismiss="modal"></button>
+      </div>
+    </div>
+  </div>
+</div>

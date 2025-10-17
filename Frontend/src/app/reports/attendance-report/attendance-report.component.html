@@ -1,0 +1,88 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="main-wrapper mt-5">
+  <div class="page-wrapper">
+    <div class="content">
+
+      <!-- Report Tabs -->
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <button *ngFor="let report of reports" class="btn"
+          [ngClass]="activeReport === report.key ? 'btn-dark' : 'btn-outline-dark'" [routerLink]="report.link">
+          {{ report.label }}
+        </button>
+      </div>
+
+      <!-- Page Header -->
+      <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+        <h5 class="fw-bold">{{ activeReport | titlecase }} Report</h5>
+        <button class="btn btn-primary" [disabled]="attendance.length === 0" (click)="exportToCSV()">
+          <i class="ti ti-file-import me-1"></i> Export
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="card shadow mb-3">
+        <div class="card-body">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label">From</label>
+              <input type="date" class="form-control" [(ngModel)]="filters.from">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">To</label>
+              <input type="date" class="form-control" [(ngModel)]="filters.to">
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-dark w-100" (click)="applyFilters()">Apply Filter</button>
+            </div>
+          </div>
+
+          <div class="mt-3 d-flex gap-2">
+            <input type="text" class="form-control" placeholder="Search by name..." [(ngModel)]="filters.name"
+              (input)="applyFilters()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Table -->
+      <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Date</th>
+              <th>Shift</th>
+              <th>Late Mark</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let rec of filteredRecords; trackBy: trackById">
+              <td>{{ rec.empName }}</td>
+              <td>{{ rec.department || 'N/A' }}</td>
+              <td>{{ rec.date | date:'mediumDate' }}</td>
+              <td>{{ rec.shift || 'N/A' }}</td>
+              <td>
+                <span class="badge" [ngClass]="rec.lateMark ? 'bg-warning text-dark' : 'bg-success'">
+                  {{ rec.lateMark ? 'Yes' : 'No' }}
+                </span>
+              </td>
+              <td>{{ rec.checkIn || 'N/A' }}</td>
+              <td>{{ rec.checkOut || 'N/A' }}</td>
+            </tr>
+
+            <tr *ngIf="filteredRecords.length === 0">
+              <td colspan="7" class="text-center text-muted py-3">
+                No attendance records found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>

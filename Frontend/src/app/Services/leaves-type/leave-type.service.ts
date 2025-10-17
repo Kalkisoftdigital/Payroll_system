@@ -5,14 +5,16 @@ import { Observable } from 'rxjs';
 export interface LeaveType {
   id?: number;
   name: string;
-  status?: string;
+  status?: 'Active' | 'Inactive';
+  created_at?: string;
+  updated_at?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class LeaveTypesService {
-  private apiUrl = 'http://localhost:3000/api/leave-types'; // replace with your backend
+  private apiUrl = 'http://localhost:3000/api/leave-types';
 
   constructor(private http: HttpClient) {}
 
@@ -31,4 +33,5 @@ export class LeaveTypesService {
   deleteLeaveType(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+  
 }

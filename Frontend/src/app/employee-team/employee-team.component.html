@@ -1,291 +1,222 @@
 <app-nav-bar></app-nav-bar>
-<div class="page-wrapper">
+<div class="main-wrapper mt-5">
+  <div class="page-wrapper">
 
-    <!-- Start Content -->
     <div class="content">
 
-        <!-- Page Header -->
-        <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-            <div class="flex-grow-1">
-                <h5 class="fw-bold">Employees</h5>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb breadcrumb-divide p-0 mb-0">
-                        <li class="breadcrumb-item d-flex align-items-center"><a href="dashboard"><i
-                                    class="ti ti-home me-1"></i>Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Employees</li>
-                    </ol>
-                </nav>
-            </div>
-            <div>
-                <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal"
-                    data-bs-target="#add_modal"><i class="ti ti-circle-plus me-1"></i>New Team</a>
-            </div>
+      <!-- Page Header -->
+      <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
+        <div class="flex-grow-1">
+          <h5 class="fw-bold">Employees</h5>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-divide p-0 mb-0">
+              <li class="breadcrumb-item d-flex align-items-center"><a href="dashboard"><i
+                    class="ti ti-home me-1"></i>Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Employees</li>
+            </ol>
+          </nav>
         </div>
-        <!-- End Page Header -->
-
-        <div class="d-flex align-items-center mb-3">
-            <a href="employees" class="btn btn-sm btn-light border fs-14 me-2">All Employees</a>
-            <a href="employee-team" class="btn btn-sm btn-dark fs-14 me-2">Team</a>
+        <div>
+          <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_modal">
+            <i class="ti ti-circle-plus me-1"></i>New Team
+          </a>
         </div>
+      </div>
+      <!-- End Page Header -->
 
-        <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-            <div class="datatable-search">
-                <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm"
-                    (input)="onSearch()" />
-                <a href="javascript:void(0);" class="input-text">
-                    <i class="ti ti-search"></i>
-                </a>
-            </div>
-            <div class="d-flex align-items-center">
-                <div class="d-flex align-items-center border rounded table-grid me-2">
-                    <a href="employee-team" class="btn p-1 btn-primary"><i class="ti ti-list"></i></a>
-                    <a href="employees-grid" class="btn p-1"><i class="ti ti-layout-grid"></i></a>
-                </div>
-                <div class="dropdown me-2">
-                    <a href="javascript:void(0);"
-                        class="btn fs-14 py-1 btn-outline-white d-inline-flex align-items-center"
-                        data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                        <i class="ti ti-filter me-1"></i>Filter
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0 border-0" id="filter-dropdown">
-                        <div class="card mb-0">
-                            <div class="card-header">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <h6 class="fw-bold mb-0">Filter</h6>
-                                    <div class="d-flex align-items-center">
-                                        <a href="javascript:void(0);"
-                                            class="link-danger text-decoration-underline">Clear All</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <form action="#">
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <label class="form-label">Team</label>
-                                            <a href="javascript:void(0);" class="link-primary mb-1">Reset</a>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <label class="form-label">Status</label>
-                                            <a href="javascript:void(0);" class="link-primary mb-1">Reset</a>
-                                        </div>
-                                        <div class="dropdown">
-                                            <a href="javascript:void(0);"
-                                                class="dropdown-toggle justify-content-between btn bg-light justify-content-start border w-100"
-                                                data-bs-toggle="dropdown" data-bs-auto-close="outside"
-                                                aria-expanded="true">
-                                                Select
-                                            </a>
-                                            <ul class="dropdown-menu dropdown-menu w-100">
-                                                <li>
-                                                    <label
-                                                        class="dropdown-item px-2 d-flex align-items-center rounded-1">
-                                                        <input class="form-check-input m-0 me-2" type="checkbox">
-                                                        Active
-                                                    </label>
-                                                </li>
-                                                <li>
-                                                    <label
-                                                        class="dropdown-item px-2 d-flex align-items-center rounded-1">
-                                                        <input class="form-check-input m-0 me-2" type="checkbox">
-                                                        Inactive
-                                                    </label>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-footer d-flex align-items-center justify-content-end">
-                                    <button type="button" class="btn btn-outline-white me-2"
-                                        id="close-filter">Close</button>
-                                    <button type="submit" class="btn btn-primary">Filter</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="dropdown" [class.show]="sortDropdownOpen">
-                    <button class="btn fs-14 py-1 btn-outline-white d-inline-flex align-items-center"
-                        (click)="toggleSortDropdown()">
-                        <i class="ti ti-sort-descending-2 text-dark me-1"></i> Sort By: {{ selectedSort }}
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end p-1" [class.show]="sortDropdownOpen">
-                        <li><button class="dropdown-item" (click)="sortBy('Newest')">Newest</button></li>
-                        <li><button class="dropdown-item" (click)="sortBy('Oldest')">Oldest</button></li>
-                        <li><button class="dropdown-item" (click)="sortBy('Descending')">Descending</button></li>
-                        <li><button class="dropdown-item" (click)="sortBy('Last Month')">Last Month</button></li>
-                        <li><button class="dropdown-item" (click)="sortBy('Last 7 Days')">Last 7 Days</button></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="table-responsive mt-4">
-            <table class="table table-nowrap datatable">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Team</th>
-                        <th>Total Members</th>
-                        <th>Members</th>
-                        <th>Status</th>
-                        <th class="no-sort">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let t of teams">
-                        <td>{{ t.team }}</td>
-                        <td>{{ t.members.length }}</td>
-                        <td>
-                            <ng-container *ngFor="let m of t.members">
-                                <img [src]="getEmployeeImage(m)" [alt]="m.firstname + ' ' + m.lastName" width="40"
-                                    height="40" class="rounded-circle me-1" style="object-fit: cover;" />
-                            </ng-container>
-                        </td>
-                        <td>
-                            <select class="form-select form-select-sm" [(ngModel)]="t.status"
-                                (change)="onStatusChange(t)">
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                            </select>
-
-                        </td>
-                        <td class="d-flex gap-2">
-                            <button class="btn btn-sm btn-primary" (click)="openEditModal(t)">Edit</button>
-                            <button class="btn btn-sm btn-danger" (click)="openDeleteModal(t)">Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-    </div>
-</div>
-
-<div class="modal fade" id="add_modal">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="page-title">
-                    <h6 class="fw-bold mb-0">Add New Team</h6>
-                </div>
-                <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close"><i
-                        class="ti ti-x"></i></button>
-            </div>
-            <form>
-                <div class="modal-body">
-                    <!-- Team Name Dropdown -->
-                    <div class="mb-3">
-                        <label class="form-label">Team Name <span class="text-danger">*</span></label>
-                        <select class="form-select" [(ngModel)]="newTeamName" name="teamName">
-                            <option value="">-- Select Team --</option>
-                            <option *ngFor="let team of teams" [value]="team.name">{{ team.name }}</option>
-                            <option value="__new">+ Create New Team</option>
-                        </select>
-                    </div>
-
-                    <!-- Show input only if "Create New Team" is selected -->
-                    <div class="mb-3" *ngIf="newTeamName === '__new'">
-                        <label class="form-label">Enter New Team Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" [(ngModel)]="customTeamName" name="customTeamName"
-                            placeholder="Enter team name" />
-                    </div>
-
-                    <!-- Employee Selection -->
-                    <div class="mb-3">
-                        <label class="form-label">Add Member <span class="text-danger">*</span></label>
-                        <select class="form-select" [(ngModel)]="selectedEmployeeId"
-                            [ngModelOptions]="{standalone: true}">
-                            <option value="">Select Employee</option>
-                            <option *ngFor="let emp of employees" [value]="emp.id">
-                                {{ emp.firstname }} {{ emp.lastName }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <div class="d-flex align-items-center justify-content-end">
-                        <button type="button" class="btn me-2 btn-light" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" (click)="addTeam()">Add Team</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div> <!-- end modal -->
-
-<div class="modal fade" id="edit_modal">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="page-title">
-          <h6 class="fw-bold mb-0">Edit Team</h6>
-        </div>
-        <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close">
-          <i class="ti ti-x"></i>
-        </button>
+      <!-- Tab Buttons -->
+      <div class="d-flex align-items-center mb-3">
+        <a href="employees" class="btn btn-sm btn-light border fs-14 me-2">All Employees</a>
+        <a href="employee-team" class="btn btn-sm btn-dark fs-14 me-2">Team</a>
       </div>
 
-      <form>
-        <div class="modal-body" *ngIf="selectedTeam">
-          <div class="mb-3">
-            <label class="form-label">Team Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" [(ngModel)]="selectedTeam.team" name="editTeamName" />
+      <!-- Search and Sort -->
+      <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
+        <div class="datatable-search">
+          <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm"
+            (input)="onSearch()" />
+          <a href="javascript:void(0);" class="input-text"><i class="ti ti-search"></i></a>
+        </div>
+        <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center border rounded table-grid me-2">
+            <a href="employee-team" class="btn p-1 btn-primary"><i class="ti ti-list"></i></a>
+            <a href="employees-grid" class="btn p-1"><i class="ti ti-layout-grid"></i></a>
+          </div>
+          <div class="dropdown me-2">
+            <a href="javascript:void(0);" class="btn fs-14 py-1 btn-outline-white d-inline-flex align-items-center"
+              data-bs-toggle="dropdown" data-bs-auto-close="outside">
+              <i class="ti ti-filter me-1"></i>Filter
+            </a>
+            <!-- Filter dropdown logic can be enhanced with Angular if needed -->
           </div>
 
-<div class="mb-3">
-  <label class="form-label">Add Member</label>
-  <select class="form-select" [(ngModel)]="selectedEmployeeId" [ngModelOptions]="{standalone: true}">
-    <option value="">Select Employee</option>
-    <option *ngFor="let emp of employees" [value]="emp.id">
-      {{ emp.firstname }} {{ emp.lastName }}
-    </option>
-  </select>
-<button type="button" class="btn btn-secondary" (click)="addMemberToTeam()">Add Member</button>
-</div>
+          <!-- Sort Dropdown -->
+          <div class="dropdown" [class.show]="sortDropdownOpen">
+            <button class="btn fs-14 py-1 btn-outline-white d-inline-flex align-items-center"
+              (click)="toggleSortDropdown()">
+              <i class="ti ti-sort-descending-2 text-dark me-1"></i> Sort By: {{ selectedSort }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end p-1" [class.show]="sortDropdownOpen">
+              <li><button class="dropdown-item" (click)="sortBy('Newest')">Newest</button></li>
+              <li><button class="dropdown-item" (click)="sortBy('Oldest')">Oldest</button></li>
+              <li><button class="dropdown-item" (click)="sortBy('Descending')">Descending</button></li>
+              <li><button class="dropdown-item" (click)="sortBy('Last Month')">Last Month</button></li>
+              <li><button class="dropdown-item" (click)="sortBy('Last 7 Days')">Last 7 Days</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
-<div class="mb-3">
-  <label class="form-label">Current Members</label>
-  <div class="d-flex flex-wrap gap-2">
-    <div *ngFor="let m of selectedTeam.members" class="member-chip d-flex align-items-center">
-      <img [src]="getEmployeeImage(m)" class="avatar-sm rounded-circle me-1" />
-      {{ m.firstname }} {{ m.lastName }}
-      <button type="button" class="btn-close btn-close-sm ms-1" (click)="removeMemberFromTeam(m)"></button>
+      <!-- Teams Table -->
+      <div class="table-responsive mt-4">
+        <table class="table table-nowrap datatable">
+          <thead class="thead-light">
+            <tr>
+              <th>Team</th>
+              <th>Total Members</th>
+              <th>Members</th>
+              <th>Status</th>
+              <th class="no-sort">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of filteredTeams">
+              <td>{{ t.team }}</td>
+              <td>{{ t.members.length }}</td>
+              <td>
+                <div class="team-members">
+                  <ng-container *ngFor="let m of t.members | slice:0:4">
+                    <img [src]="getEmployeeImage(m)" [alt]="m.firstname + ' ' + m.lastName" />
+                  </ng-container>
+                  <div *ngIf="t.members.length > 4" class="member-counter">
+                    +{{ t.members.length - 4 }}
+                  </div>
+                </div>
+              </td>
+              <td>
+                <select class="form-select form-select-sm" [(ngModel)]="t.status" (change)="onStatusChange(t)">
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </td>
+              <td class="d-flex gap-2">
+                <button class="btn btn-sm btn-primary" (click)="openEditModal(t)">Edit</button>
+                <button class="btn btn-sm btn-danger" (click)="openDeleteModal(t)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
-        </div>
 
-        <div class="modal-footer">
-          <div class="d-flex align-items-center justify-content-end">
-            <button type="button" class="btn me-2 btn-light" data-bs-dismiss="modal">Cancel</button>
+  <!-- Add Team Modal -->
+  <div class="modal fade" id="add_modal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h6 class="fw-bold mb-0">Add New Team</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Team Name <span class="text-danger">*</span></label>
+              <select class="form-select" [(ngModel)]="newTeamName" name="teamName">
+                <option value="">-- Select Team --</option>
+                <option *ngFor="let team of availableTeams" [value]="team.name">{{ team.name }}</option>
+                <option value="__new">+ Create New Team</option>
+              </select>
+            </div>
+            <div class="mb-3" *ngIf="newTeamName === '__new'">
+              <label class="form-label">Enter New Team Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" [(ngModel)]="customTeamName" name="customTeamName"
+                placeholder="Enter team name" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Add Member <span class="text-danger">*</span></label>
+              <select class="form-select" [(ngModel)]="selectedEmployeeId" [ngModelOptions]="{standalone: true}">
+                <option value="">Select Employee</option>
+                <option *ngFor="let emp of employees" [value]="emp.id">{{ emp.firstname }} {{ emp.lastName }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" (click)="addTeam()">Add Team</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Team Modal -->
+  <div class="modal fade" id="edit_modal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" *ngIf="selectedTeam">
+        <div class="modal-header">
+          <h6 class="fw-bold mb-0">Edit Team</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Team Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" [(ngModel)]="selectedTeam.team" name="editTeamName" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Add Members</label>
+
+              <div *ngFor="let emp of employees" class="form-check">
+                <input type="checkbox" class="form-check-input" [value]="emp.id ?? 0"
+                  (change)="onEmployeeCheckboxChange($event, emp)"
+                  [checked]="selectedEmployeeIds.includes(emp.id ?? 0)" />
+                <label class="form-check-label">
+                  {{ emp.firstname }} {{ emp.lastName }}
+                </label>
+              </div>
+
+              <button type="button" class="btn btn-secondary mt-2" (click)="addMembersToTeam()">
+                Add Selected Members
+              </button>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Current Members</label>
+              <div class="d-flex flex-wrap gap-2">
+                <div *ngFor="let m of selectedTeam.members" class="member-chip d-flex align-items-center">
+                  <img [src]="getEmployeeImage(m)" class="avatar-sm rounded-circle me-1" />
+                  {{ m.firstname }} {{ m.lastName }}
+                  <button type="button" class="btn-close btn-close-sm ms-1" (click)="removeMemberFromTeam(m)"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-primary" (click)="saveEditTeam()">Save Changes</button>
           </div>
-        </div>
-      </form>
-
-<!-- Start Modal  -->
-<div class="modal fade" id="delete_modal">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="mb-3">
-                    <span class="avatar bg-danger"><i class="ti ti-trash fs-24"></i></span>
-                </div>
-                <h6 class="mb-1">Delete Confirmation</h6>
-                <p class="mb-3">Are you sure you want to delete this team?</p>
-                <div class="d-flex justify-content-center">
-                    <button type="button" class="btn btn-outline-white w-100 me-2"
-                        data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger w-100" (click)="confirmDelete()"
-                        data-bs-dismiss="modal">
-                        Yes, Delete
-                    </button>
-                </div>
-            </div>
-        </div>
+        </form>
+      </div>
     </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal fade" id="delete_modal">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <div class="mb-3">
+            <span class="avatar bg-danger"><i class="ti ti-trash fs-24"></i></span>
+          </div>
+          <h6 class="mb-1">Delete Confirmation</h6>
+          <p class="mb-3">Are you sure you want to delete this team?</p>
+          <div class="d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-light w-50" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger w-50" (click)="confirmDelete()" data-bs-dismiss="modal">Yes,
+              Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

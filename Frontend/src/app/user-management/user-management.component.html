@@ -1,0 +1,185 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="main-wrapper mt-5">
+    <div class="page-wrapper">
+        <div class="content">
+
+            <!-- Overlay for dim background -->
+            <div *ngIf="showAddUser" class="overlay" (click)="toggleAddUser(false)"></div>
+
+            <!-- Add New User Card -->
+            <div *ngIf="showAddUser" class="card shadow-sm rounded-3 add-user-card">
+                <div class="card-header">
+                    <h5 class="mb-0">Add New User</h5>
+                </div>
+                <div class="card-body">
+                    <form (ngSubmit)="onSubmit()" #userForm="ngForm">
+
+                        <!-- Employee Dropdown -->
+                        <div class="mb-3">
+                            <label class="form-label">Employee</label>
+                            <select class="form-control" [(ngModel)]="user.employee_id" name="employee"
+                                (ngModelChange)="onEmployeeChange($event)">
+                                <option [ngValue]="null" disabled selected>-- Select Employee --</option>
+                                <option *ngFor="let emp of employees" [value]="emp.id">
+                                    {{ emp.firstname }} {{ emp.lastName }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Name (auto-fill) -->
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" [(ngModel)]="user.name" name="name" readonly>
+                        </div>
+
+                        <!-- Email (auto-fill) -->
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" [(ngModel)]="user.email" name="email" readonly>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" [(ngModel)]="user.password" name="password"
+                                placeholder="Enter password" required>
+                        </div>
+
+                        <!-- Role -->
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-control" [(ngModel)]="user.role_id" name="role_id" required>
+                                <option [ngValue]="0" disabled>Select Role</option>
+                                <option *ngFor="let role of roles" [value]="role.id">{{ role.roleName }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Avatar -->
+                        <!-- <div class="mb-3">
+                            <label class="form-label">Avatar</label>
+                            <input *ngIf="user.avatarUrl" type="text" class="form-control mb-2"
+                                [(ngModel)]="user.avatarUrl" name="avatarUrl" readonly>
+                            <input *ngIf="!user.avatarUrl" type="file" class="form-control"
+                                (change)="onFileSelected($event)">
+                            <div class="mt-3" *ngIf="user.avatarUrl">
+                                <label>Preview</label><br>
+                                <img [src]="user.avatarUrl" alt="Employee Avatar" class="img-thumbnail" width="120"
+                                    height="120">
+                            </div>
+                        </div> -->
+
+                        <!-- Buttons -->
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-success"
+                                [disabled]="!userForm.form.valid">Save</button>
+                            <button type="button" class="btn btn-secondary ms-2"
+                                (click)="toggleAddUser(false)">Cancel</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Role Summary Table -->
+            <div class="card shadow-sm border-0 rounded-3 mt-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">Role Summary</h4>
+                        <button class="btn btn-primary" type="button" (click)="toggleAddUser(true)">
+                            <i class="ti ti-user-plus me-1"></i> Add New User
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-primary text-uppercase text-secondary">
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Total Users</th>
+                                    <th>Members</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let r of roleSummary" class="align-middle">
+                                    <td><span class="fw-bold">{{ r.roleName }}</span></td>
+                                    <td><span class="badge bg-primary">{{ r.total }}</span></td>
+                                    <td>
+                                        <div class="d-flex align-items-center" (click)="openMembersPopup(r)">
+                                            <ng-container *ngFor="let m of r.members | slice:0:5">
+                                                <img *ngIf="m.avatarUrl" [src]="m.avatarUrl"
+                                                    class="rounded-circle border border-white shadow-sm me-1" width="36"
+                                                    height="36" title="{{ m.name }}" />
+                                                <span *ngIf="!m.avatarUrl"
+                                                    class="member-avatar rounded-circle border border-white shadow-sm me-1 d-flex justify-content-center align-items-center text-white"
+                                                    [ngStyle]="{ 'background-color': r.color, 'width.px': 36, 'height.px': 36, 'font-size.px': 14 }"
+                                                    title="{{ m.name }}">
+                                                    {{ m.name[0] }}
+                                                </span>
+                                            </ng-container>
+                                            <span *ngIf="r.members.length > 5" class="ms-2 text-muted small">
+                                                +{{ r.members.length - 5 }} more
+                                            </span>
+                                        </div>
+                                    </td>
+
+
+                                </tr>
+                                <!-- Members Popup -->
+                                <div class="modal fade" id="membersPopup" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">{{ currentRoleName }} - Members</h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th><input type="checkbox" (change)="toggleAll($event)">
+                                                            </th>
+                                                            <th>Name</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let m of popupMembers">
+                                                            <td>
+                                                                <input type="checkbox"
+                                                                    [checked]="selectedMemberIds.includes(m.id!)"
+                                                                    (change)="toggleMember(m.id!, $event)">
+                                                            </td>
+                                                            <td>{{ m.name }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger"
+                                                    [disabled]="selectedMemberIds.length === 0"
+                                                    (click)="removeSelectedMembers()">
+                                                    Remove
+                                                </button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Close
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

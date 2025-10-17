@@ -1,0 +1,160 @@
+<!-- Begin Wrapper -->
+<app-nav-bar></app-nav-bar>
+<div class="main-wrapper mt-5">
+    <div class="page-wrapper">
+        <div class="content">
+            <!-- Page Header -->
+            <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
+                <div class="flex-grow-1">
+                    <h5 class="fw-bold">Fund Master</h5>
+                </div>
+                <div>
+                    <a href="javascript:void(0);" class="btn btn-primary" (click)="openAddModal()">
+                        <i class="ti ti-circle-plus me-1"></i> New Fund
+                    </a>
+                </div>
+            </div>
+            <!-- End Page Header -->
+
+            <!-- Fund Table -->
+            <div class="table-responsive">
+                <table class="table table-nowrap datatable">
+                    <thead>
+                        <tr>
+                            <th>Fund Name</th>
+                            <th>Percentage</th>
+                            <th>Nature</th>
+                            <th>Status</th>
+                            <th class="no-sort">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let fund of funds">
+                            <td>{{ fund.name }}</td>
+                            <td>{{ fund.percentage }} %</td>
+                            <td>{{ fund.isDeduction ? 'Deduction' : 'Allowance' }}</td>
+                            <td>
+                                <span class="badge" [ngClass]="fund.status === 'Active' ? 'bg-success' : 'bg-danger'">
+                                    {{ fund.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" (click)="openEditModal(fund)">
+                                    Edit
+                                </button>
+                                &nbsp;
+                                <button class="btn btn-sm btn-danger" *ngIf="fund.id" (click)="confirmDelete(fund.id)">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Fund Modal -->
+    <!-- Add/Edit Fund Modal -->
+    <div class="modal fade" id="addFundModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="page-title">
+                        <h6 class="fw-bold mb-0">{{ isEditMode ? 'Edit Fund' : 'Add New Fund' }}</h6>
+                    </div>
+                    <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ti ti-x"></i>
+                    </button>
+                </div>
+
+                <form [formGroup]="fundForm" (ngSubmit)="onSubmit()">
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Fund Name -->
+                            <div class="col-sm-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Fund Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" formControlName="name" required />
+                                </div>
+                            </div>
+
+                            <!-- Fund Percentage -->
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Percentage <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" formControlName="percentage" required />
+                                </div>
+                            </div>
+
+                            <!-- Fixed Amount -->
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Fixed Amount</label>
+                                    <input type="number" class="form-control" formControlName="fixed_amount" />
+                                </div>
+                            </div>
+
+                            <!-- Fund Nature -->
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Fund Nature</label>
+                                    <select formControlName="isDeduction" class="form-select">
+                                        <option [ngValue]="false">Allowance</option>
+                                        <option [ngValue]="true">Deduction</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Fund Status -->
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select formControlName="status" class="form-select">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="d-flex align-items-center justify-content-end">
+                            <button type="button" class="btn me-2 btn-light" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                {{ isEditMode ? 'Update Fund' : 'Add Fund' }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="delete_modal">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <span class="avatar bg-danger"><i class="ti ti-trash fs-24"></i></span>
+                    </div>
+                    <h6 class="mb-1">Delete Confirmation</h6>
+                    <p class="mb-3">Are you sure want to delete this fund?</p>
+                    <div class="d-flex justify-content-center">
+                        <a href="javascript:void(0);" class="btn btn-outline-white w-100 me-2" data-bs-dismiss="modal">
+                            Cancel
+                        </a>
+                        <a href="javascript:void(0);" (click)="deleteFund()" class="btn btn-danger w-100">
+
+                            Yes, Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

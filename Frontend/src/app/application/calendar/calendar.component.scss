@@ -1,0 +1,89 @@
+/* Layout */
+.container-fluid {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.page-wrapper {
+  margin-left: 240px; /* sidebar space */
+  padding: 20px;
+}
+
+/* Sidebar */
+.sidebar {
+  border-right: 1px solid rgba(0,0,0,0.05);
+}
+.sidebar .nav-link {
+  color: #333;
+  padding: 8px 0;
+}
+.sidebar .nav-link.active {
+  font-weight: 600;
+}
+
+/* Filter row */
+.filter-row {
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background: #fafafa;
+  transition: background .15s, transform .05s;
+
+  &:hover {
+    background: #f1f1f1;
+    transform: translateY(-1px);
+  }
+}
+
+/* Tooltip */
+.fc-tooltip {
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  max-width: 220px;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+/* FullCalendar overrides */
+.fc .fc-event, .fc-event {
+  color: #fff !important;
+  font-weight: 600;
+}
+
+/* Cards */
+.card {
+  border: none;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .sidebar { display: none; }
+}
+.page-wrapper {
+  padding: 20px;
+}
+
+.fc-tooltip {
+  background-color: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  position: absolute;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.filter-row {
+  cursor: pointer;
+  padding: 5px 0;
+}
+.filter-row:hover {
+  text-decoration: underline;
+}

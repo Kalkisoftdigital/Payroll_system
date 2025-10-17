@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { SalaryService, Salary } from 'src/app/Services/Salary-services/salary.service';
-import { EmployeesService, Employee } from 'src/app/Services/Employees-serives/employees.service';
+import { Salary, SalaryService } from '../../Services/Salary-services/salary.service';
+import { Employee, EmployeesService } from '../../Services/Employees-serives/employees.service';
 
 @Component({
   selector: 'app-payroll-report',
@@ -8,77 +8,157 @@ import { EmployeesService, Employee } from 'src/app/Services/Employees-serives/e
   styleUrls: ['./payroll-report.component.scss']
 })
 export class PayrollReportComponent implements OnInit {
-
-  payrolls: any[] = [];          // Combined salary + employee info
+  backendUrl = 'http://localhost:3000';
   employees: Employee[] = [];
-  filteredPayrolls: any[] = [];
-  searchText: string = '';
+  filteredEmployees: Employee[] = [];
+  salaries: Salary[] = [];
+
+  activeReport: string = 'payroll';
   filter = { from: '', to: '' };
+  searchText: string = '';
+
+  reports = [
+    { key: 'team', label: 'Team Report', link: '/reports/team-report' },
+    { key: 'attendance', label: 'Attendance Report', link: '/reports/attendance-report' },
+    { key: 'leave', label: 'Leave Report', link: '/reports/leave-report' },
+    { key: 'payroll', label: 'Payroll Report', link: '/reports/payroll-report' },
+    { key: 'contact', label: 'Contact Report', link: '/reports/contact-report' },
+  ];
 
   constructor(
-    private salaryService: SalaryService,
-    private employeeService: EmployeesService
+    private employeesService: EmployeesService,
+    private salaryService: SalaryService
   ) {}
 
   ngOnInit(): void {
     this.loadEmployees();
   }
 
-  loadEmployees() {
-    this.employeeService.getEmployees().subscribe({
-      next: emps => {
-        this.employees = emps;
-        this.loadPayrolls();
+  loadEmployees(): void {
+    this.employeesService.getEmployees().subscribe({
+      next: (data) => {
+        this.employees = data;
+        this.loadSalaries();
       },
-      error: err => console.error(err)
+      error: (err) => console.error('Failed to load employees', err)
     });
   }
 
-  loadPayrolls() {
+  loadSalaries(): void {
     this.salaryService.getSalaries().subscribe({
-      next: salaries => {
-        // Combine salary + employee info
-        this.payrolls = salaries.map(s => {
-          const emp = this.employees.find(e => e.id === s.employee_id);
-          return {
-            id: s.id,
-            name: emp ? `${emp.firstname} ${emp.lastName}` : 'Unknown',
-            email: emp?.email || 'N/A',
-            status: s.status,
-            salary: Number(s.basic) + Number(s.hra),
-            bank_name: emp?.bankName || 'N/A',
-            account_number: emp?.bankAccountNo || 'N/A',
-            date: s.date
-          };
-        });
-        this.filteredPayrolls = [...this.payrolls];
+      next: (data: Salary[]) => {
+        this.salaries = data;
+        this.applyFilters();
       },
-      error: err => console.error(err)
+      error: (err) => console.error('Failed to load salaries', err)
     });
   }
 
-  applyFilters() {
-    const fromDate = this.filter.from ? new Date(this.filter.from) : null;
-    const toDate = this.filter.to ? new Date(this.filter.to) : null;
+  applyFilters(): void {
+    let filtered = this.employees;
 
-    this.filteredPayrolls = this.payrolls.filter(p => {
-      const payrollDate = new Date(p.date || Date.now());
-      if (fromDate && payrollDate < fromDate) return false;
-      if (toDate && payrollDate > toDate) return false;
-      return true;
-    });
-    this.applySearch();
-  }
+    if (this.filter.from) {
+      const fromDate = new Date(this.filter.from);
+      filtered = filtered.filter(emp => new Date(emp.joiningDate) >= fromDate);
+    }
 
-  applySearch() {
-    if (!this.searchText) return;
-    const lower = this.searchText.toLowerCase();
-    this.filteredPayrolls = this.filteredPayrolls.filter(p =>
-      p.name.toLowerCase().includes(lower) || p.email.toLowerCase().includes(lower)
+    if (this.filter.to) {
+      const toDate = new Date(this.filter.to);
+      filtered = filtered.filter(emp => new Date(emp.joiningDate) <= toDate);
+    }
+
+    this.filteredEmployees = filtered.filter(emp =>
+      emp.name.toLowerCase().includes(this.searchText.toLowerCase())
     );
   }
 
-  trackById(index: number, item: any) {
-    return item.id;
+  applySearch(): void {
+    this.applyFilters();
+  }
+
+  trackById(index: number, emp: Employee): number {
+    return emp.id ?? index;
+  }
+
+  getSalaryByEmployee(empId?: number): Salary | undefined {
+    return this.salaries.find(s => s.employee_id === empId);
+  }
+
+getFundAmountByEmployee(empId: number, fundName: string): number {
+  const salary = this.getSalaryByEmployee(empId);
+  if (!salary) return 0;
+
+  switch (fundName.toLowerCase()) {
+    case 'hra':
+      return salary.hra ?? 0;
+    case 'da':
+      return salary.da ?? 0;
+    case 'conveyance':
+      return salary.conveyance ?? 0;
+    case 'pf':
+      return salary.pf ?? 0;
+    case 'bonus':
+      return salary.bonus ?? 0;
+    default:
+      // If not a direct field, check appliedFunds array
+      if (!salary.appliedFunds) return 0;
+      const funds: any[] = Array.isArray(salary.appliedFunds) ? salary.appliedFunds : JSON.parse(salary.appliedFunds);
+      const fund = funds.find(f => f.name.toLowerCase() === fundName.toLowerCase());
+      return fund?.calculatedAmount ?? 0;
+  }
+}
+
+  getSalaryTotalByEmployee(empId: number): number {
+    return this.getSalaryByEmployee(empId)?.total ?? 0;
+  }
+
+  getEmployeeImage(emp: Employee): string {
+    return emp.image ? `${this.backendUrl}${emp.image}` : 'assets/default-user.png';
+  }
+
+  onImageError(event: any) {
+    event.target.src = 'assets/default-user.png';
+  }
+
+  getStatusClass(status: string): string {
+    if (!status) return '';
+    const s = status.toLowerCase();
+    return s === 'active' ? 'bg-success' :
+           s === 'inactive' ? 'bg-warning text-dark' :
+           s === 'on_leave' ? 'bg-info text-dark' : '';
+  }
+
+  exportToCSV(): void {
+    if (!this.filteredEmployees.length) return;
+
+    const headers = ['Name', 'Office', 'Email', 'Employment Type', 'Position', 'Joining Date', 'Team', 'Status', 'Basic', 'HRA', 'DA', 'Conveyance', 'PF', 'Bonus', 'Total'];
+    const rows = this.filteredEmployees.map(emp => [
+      emp.name,
+      emp.office,
+      emp.email,
+      emp.employmentType,
+      emp.position,
+      emp.joiningDate,
+      emp.team,
+      emp.status,
+      this.getSalaryByEmployee(emp.id)?.basic ?? 0,
+      this.getFundAmountByEmployee(emp.id!, 'HRA'),
+      this.getFundAmountByEmployee(emp.id!, 'DA'),
+      this.getFundAmountByEmployee(emp.id!, 'Conveyance'),
+      this.getFundAmountByEmployee(emp.id!, 'PF'),
+      this.getFundAmountByEmployee(emp.id!, 'Bonus'),
+      this.getSalaryTotalByEmployee(emp.id!)
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' +
+      [headers, ...rows].map(e => e.join(',')).join('\n');
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'payroll-report.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }

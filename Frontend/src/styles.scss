@@ -519,7 +519,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
   --pr-emphasis-color-rgb: 255, 255, 255;
   --pr-secondary-color: rgba(222, 226, 230, 0.75);
   --pr-secondary-color-rgb: 222, 226, 230;
-  --pr-secondary-bg: #343a40;
+  --pr-secondary-bg: ##2c3e50;
   --pr-secondary-bg-rgb: 52, 58, 64;
   --pr-tertiary-color: rgba(222, 226, 230, 0.5);
   --pr-tertiary-color-rgb: 222, 226, 230;
@@ -539,7 +539,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
   --pr-info-bg-subtle: rgb(2.6, 40.4, 48);
   --pr-warning-bg-subtle: rgb(51, 38.6, 1.4);
   --pr-danger-bg-subtle: rgb(44, 10.6, 13.8);
-  --pr-light-bg-subtle: #343a40;
+  --pr-light-bg-subtle: #2c3e50;
   --pr-dark-bg-subtle: #1a1d20;
   --pr-primary-border-subtle: rgb(7.8, 66, 151.8);
   --pr-secondary-border-subtle: rgb(64.8, 70.2, 75);
@@ -548,7 +548,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
   --pr-warning-border-subtle: rgb(153, 115.8, 4.2);
   --pr-danger-border-subtle: rgb(132, 31.8, 41.4);
   --pr-light-border-subtle: #495057;
-  --pr-dark-border-subtle: #343a40;
+  --pr-dark-border-subtle: #2c3e50;
   --pr-heading-color: inherit;
   --pr-link-color: rgb(109.8, 168, 253.8);
   --pr-link-hover-color: rgb(138.84, 185.4, 254.04);
@@ -13271,17 +13271,33 @@ button.dropdown-toggle::after {
 /* ==================
 Header CSS
 ===================== */
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100%;
+}
+.main-container {
+  padding-top: var(--pr-topbar-height);
+}
+
 .navbar-header {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 1000;
+  left: 0;
+  right: 0;
+  z-index: 1100; 
   background: #2c3e50;
-  min-height: var(--pr-topbar-height);
-  margin-left: var(--pr-sidenav-width);
-  transition: all 0.25s ease-in-out;
+  height: var(--pr-topbar-height);
   border-bottom: 1px solid var(--pr-topbar-item-border);
+  margin: 0 !important;
   padding: 0 1.25rem;
 }
+
+.page-wrapper {
+  margin-top: var(--pr-topbar-height);
+}
+
 @media (max-width: 991.98px) {
   .navbar-header {
     margin-left: 0;
@@ -14512,7 +14528,7 @@ html[data-bs-theme=dark] #light-dark-mode .ti-moon::before {
 
 .sidebar .sidebar-inner {
   width: 100%;
-  background-color: #343a40 ;
+  background-color:#2c3e50;
   color: white;
 }
 .sidebar .sidebar-menu {

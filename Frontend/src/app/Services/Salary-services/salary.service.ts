@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SalaryTransaction } from '../../models/salary.model';
+import { Fund } from '../fund-services/fund.service';
 
 
 export interface Salary {
@@ -10,9 +11,35 @@ export interface Salary {
   basic: number;
   hra: number;
   total: number;
-  date: string;  
+  date: string;
   status: string;
   employee_id: number;
+  da?: number;
+  conveyance?: number;
+  pf?: number;
+  appliedFunds?: Fund[];
+  lineManager?: string;
+  email?: string;
+  bonus?: number;
+  paidDays?: number;
+  lopDays?: number;
+  travel?: number;
+  gross?: number;
+  deductions?: number;
+  net?: number;
+  lopDay?: number;
+  fundAmount?: number;
+  fundId?: number;
+  totalMonthly: number;
+  fixedAllowance?: number;
+  fixedAllowanceMonthly?: number;
+  fixedAllowanceAnnual?: number;
+  hra_monthly?: number;
+  fixed_allowance_monthly?: number;
+  employeeName?: string;
+  employeeEmail?: string;
+
+
 }
 @Injectable({
   providedIn: 'root'
@@ -20,7 +47,7 @@ export interface Salary {
 export class SalaryService {
   private apiUrl = 'http://localhost:3000/api/salary';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getSalaries(): Observable<Salary[]> {
     return this.http.get<Salary[]>(this.apiUrl);
@@ -37,18 +64,23 @@ export class SalaryService {
   deleteSalary(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-getSalaryByEmployee(employeeId: number): Observable<SalaryTransaction[]> {
-  return this.http.get<SalaryTransaction[]>(`${this.apiUrl}?employeeId=${employeeId}`);
-}
-
-  getSalaryById(id: number): Observable<Salary> {
-    return this.http.get<Salary>(`${this.apiUrl}/${id}`);                     
+  getSalaryByEmployee(employeeId: number): Observable<SalaryTransaction[]> {
+    return this.http.get<SalaryTransaction[]>(`${this.apiUrl}?employeeId=${employeeId}`);
   }
 
-updateSalaryStatus(id: number, status: string) {
-  return this.http.put(`${this.apiUrl}/${id}/status`, { status });
-}
-getAllSalary() {
-  return this.http.get<any[]>('http://localhost:3000/api/salary');
-}
+  getSalaryById(id: number): Observable<Salary> {
+    return this.http.get<Salary>(`${this.apiUrl}/${id}`);
+  }
+
+  updateSalaryStatus(id: number, status: string) {
+    return this.http.put(`${this.apiUrl}/${id}/status`, { status });
+  }
+  getAllSalary() {
+    return this.http.get<any[]>('http://localhost:3000/api/salary');
+  }
+  sendSalaryCertificate(employeeId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${employeeId}/salary-certificate`, {});
+  }
+
+
 }

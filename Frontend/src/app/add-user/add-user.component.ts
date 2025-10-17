@@ -8,21 +8,31 @@ interface Role {
 }
 
 export interface User {
+  employee_id?: number;
   id?: number;
   name: string;
   email: string;
   role_id: number;
   avatarUrl?: string | null;
+   password: string;  
+}
+interface Employee {
+  id: number;
+  firstname: string;
+  lastName: string;
+  email: string;
+  image?: string;
 }
 
 @Component({
   selector: 'app-add-user',
   templateUrl: './add-user.component.html',
-  styleUrls: ['./add-user.component.scss'] // make sure this file exists
+  styleUrls: ['./add-user.component.scss']
 })
 export class AddUserComponent implements OnInit {
   roles: Role[] = [];
-  user: User = { name: '', email: '', role_id: 0, avatarUrl: null };
+  employees: Employee[] = [];   // <--- store employees
+  user: User = { name: '', email: '', role_id: 0, avatarUrl: null ,password: ''};
   isEditMode = false;
   private api = 'http://localhost:3000/api';
 
@@ -30,10 +40,11 @@ export class AddUserComponent implements OnInit {
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadRoles();
+    this.loadEmployees();   // <-- load employees
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -54,66 +65,86 @@ export class AddUserComponent implements OnInit {
     });
   }
 
+  loadEmployees(): void {
+    this.http.get<Employee[]>(`${this.api}/employees`).subscribe({
+      next: (res) => (this.employees = res),
+      error: (err) => console.error('Error loading employees:', err)
+    });
+  }
+
   loadUserById(id: number): void {
     this.http.get<User>(`${this.api}/users/${id}`).subscribe({
       next: (res) => {
         this.user = {
           id: res.id,
+          employee_id: res.employee_id,
           name: res.name,
           email: res.email,
           role_id: res.role_id,
-          avatarUrl: res.avatarUrl || null
+          avatarUrl: res.avatarUrl || null,
+          password: ''  
         };
       },
       error: (err) => console.error('Error loading user:', err)
     });
   }
 
-  onFileSelected(event: any): void {
-    const file: File = event.target.files?.[0];
-    if (!file) return;
 
-    const formData = new FormData();
-    formData.append('avatar', file);
+onSubmit(): void {
+  if (!this.user.employee_id || !this.user.email || !this.user.role_id) {
+    alert('All fields are required');
+    return;
+  }
 
-    this.http.post<{ imageUrl: string }>(`${this.api}/upload`, formData).subscribe({
-      next: (res) => {
-        this.user.avatarUrl = `http://localhost:3000${res.imageUrl}`;
-      },
-      error: (err) => console.error('Upload error:', err)
+  // ensure employee_id is number
+  const payload = {
+    ...this.user,
+    employee_id: Number(this.user.employee_id),
+    password: '1234'   // <-- default password add
+  };
+
+  // assign name from selected employee
+  const emp = this.employees.find(e => e.id === payload.employee_id);
+  payload.name = emp ? `${emp.firstname} ${emp.lastName}` : '';
+
+  if (this.isEditMode && this.user.id) {
+    this.http.put(`${this.api}/users/${this.user.id}`, payload).subscribe({
+      next: () => { alert('User updated successfully'); this.router.navigate(['/manage-admin']); },
+      error: (err) => { console.error(err); alert('Error updating user'); }
+    });
+  } else {
+    this.http.post(`${this.api}/users`, payload).subscribe({
+      next: () => { alert('User added successfully'); this.router.navigate(['/manage-admin']); },
+      error: (err) => { console.error(err); alert('Error saving user'); }
     });
   }
+}
 
-  onSubmit(): void {
-    if (!this.user.name || !this.user.email || !this.user.role_id) {
-      alert('All fields are required');
-      return;
-    }
+  onEmployeeChange(employeeId: number) {
+    const emp = this.employees.find(e => e.id === +employeeId);
+    if (emp) {
+      this.user.employee_id = emp.id;
+      this.user.name = emp.firstname + ' ' + emp.lastName;
+      this.user.email = emp.email;
 
-    if (this.isEditMode && this.user.id) {
-      // UPDATE
-      this.http.put(`${this.api}/users/${this.user.id}`, this.user).subscribe({
-        next: () => {
-          alert('User updated successfully');
-          this.router.navigate(['/manage-admin']);
-        },
-        error: (err) => {
-          console.error(err);
-          alert('Error updating user');
-        }
-      });
-    } else {
-      // CREATE
-      this.http.post(`${this.api}/users`, this.user).subscribe({
-        next: () => {
-          alert('User added successfully');
-          this.router.navigate(['/manage-admin']);
-        },
-        error: (err) => {
-          console.error(err);
-          alert('Error saving user');
-        }
-      });
+      if (emp.image) {
+        this.user.avatarUrl = `http://localhost:3000/uploads/${emp.image}`;
+      } else {
+        this.user.avatarUrl = '';
+      }
     }
   }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.user.avatarUrl = e.target.result; // preview uploaded image
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  
 }

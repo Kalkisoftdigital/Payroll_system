@@ -1,8 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import * as bootstrap from 'bootstrap';
 import { LeaveTypesService } from '../Services/leaves-type/leave-type.service';
+import * as bootstrap from 'bootstrap';
+
+export interface LeaveType {
+  id?: number;
+  name: string;
+  status?: 'Active' | 'Inactive';
+  created_at?: string;
+}
 
 @Component({
   selector: 'app-leave-types',
@@ -10,17 +16,19 @@ import { LeaveTypesService } from '../Services/leaves-type/leave-type.service';
   styleUrls: ['./leave-types.component.scss']
 })
 export class LeaveTypesComponent implements OnInit {
-  leaveTypes: any[] = [];
+  leaveTypes: LeaveType[] = [];
   addForm!: FormGroup;
   editForm!: FormGroup;
-  selectedLeave: any;
-  apiUrl = 'http://localhost:3000/api/leave-types';
+  selectedLeave: LeaveType | null = null;
 
-  constructor(private fb: FormBuilder, private http: HttpClient,
-    private LeaveTypeService :LeaveTypesService
+  @ViewChild('deleteModal') deleteModal!: ElementRef;
+
+  constructor(
+    private fb: FormBuilder,
+    private leaveTypeService: LeaveTypesService
   ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.addForm = this.fb.group({
       name: ['', Validators.required]
     });
@@ -33,62 +41,94 @@ export class LeaveTypesComponent implements OnInit {
     this.loadLeaveTypes();
   }
 
+  // Load leave types from backend
   loadLeaveTypes() {
-    this.http.get<any[]>(this.apiUrl).subscribe({
-      next: data => this.leaveTypes = data,
+    this.leaveTypeService.getLeaveTypes().subscribe({
+      next: data => {
+        this.leaveTypes = data.map(l => ({
+          ...l,
+          status: l.status === 'Inactive' ? 'Inactive' : 'Active'
+        }));
+      },
       error: err => console.error('Error loading leave types', err)
     });
   }
 
-  // ✅ Add leave
-// Add leave
-addLeave(modalRef: any) {
-  if (this.addForm.invalid) return;
+  // Add leave type
+  addLeave(modalRef: any) {
+    if (this.addForm.invalid) return;
 
-  this.http.post(this.apiUrl, this.addForm.value).subscribe({
-    next: () => {
-      this.loadLeaveTypes();   // refresh list
-      this.addForm.reset();
-      const modal = bootstrap.Modal.getInstance(modalRef); // ✅ close modal correctly
-      modal?.hide();
-    },
-    error: err => console.error('Error adding leave', err)
-  });
-}
-  // ✅ Open edit modal
-  openEditModal(leave: any, modalRef: any) {
-    this.selectedLeave = leave;
-    this.editForm.patchValue(leave);
-    const modal = new bootstrap.Modal(modalRef);
-    modal.show();
-  }
-  saveEdit(modalRef: any) {
-    if (this.editForm.invalid) return;
-
-    this.http.put(`${this.apiUrl}/${this.editForm.value.id}`, this.editForm.value).subscribe({
+    this.leaveTypeService.addLeaveType({
+      ...this.addForm.value,
+      status: 'Active'
+    }).subscribe({
       next: () => {
         this.loadLeaveTypes();
-        const modal = bootstrap.Modal.getInstance(modalRef);
-        modal?.hide();
+        this.addForm.reset();
+        bootstrap.Modal.getInstance(modalRef)?.hide();
+        alert('Leave type added successfully ✅');   // <-- Alert
+      },
+      error: err => {
+        console.error('Error adding leave type', err);
+        alert('Error adding leave type ❌');         // <-- Alert
       }
     });
   }
 
-  // ✅ Open delete modal
-openDeleteModal(id: number, modalRef: any) {
-  this.selectedLeave = id;
-  const modal = new bootstrap.Modal(modalRef); // Create Modal instance
-  modal.show();
-}
+  // Open edit modal
+  openEditModal(leave: LeaveType, modalRef: any) {
+    this.selectedLeave = leave;
+    this.editForm.patchValue(leave);
+    new bootstrap.Modal(modalRef).show();
+  }
 
-confirmDelete(modalRef: any) {
-  this.http.delete(`${this.apiUrl}/${this.selectedLeave}`).subscribe({
-    next: () => {
-      this.loadLeaveTypes(); // refresh list
-      const modal = bootstrap.Modal.getInstance(modalRef); // get existing instance
-      modal?.hide();
-    },
-    error: err => console.error('Error deleting leave', err)
-  });
-}
+  // Save edit
+  saveEdit(modalRef: any) {
+    if (!this.selectedLeave || this.editForm.invalid) return;
+
+    this.leaveTypeService.updateLeaveType(this.selectedLeave.id!, this.editForm.value).subscribe({
+      next: () => {
+        this.loadLeaveTypes();
+        bootstrap.Modal.getInstance(modalRef)?.hide();
+        alert('Leave type updated successfully ✏️'); // <-- Alert
+        this.selectedLeave = null;
+      },
+      error: err => {
+        console.error('Error editing leave type', err);
+        alert('Error updating leave type ❌');        // <-- Alert
+      }
+    });
+  }
+
+  // Open delete modal
+  openDeleteModal(leave: LeaveType) {
+    this.selectedLeave = leave;
+    new bootstrap.Modal(this.deleteModal.nativeElement).show();
+  }
+
+  // Confirm delete
+  confirmDelete() {
+    if (!this.selectedLeave) return;
+
+    this.leaveTypeService.deleteLeaveType(this.selectedLeave.id!).subscribe({
+      next: () => {
+        this.loadLeaveTypes();
+        bootstrap.Modal.getInstance(this.deleteModal.nativeElement)?.hide();
+        alert('Leave type deleted successfully 🗑️'); // <-- Alert
+        this.selectedLeave = null;
+      },
+      error: err => {
+        console.error('Error deleting leave type', err);
+        alert('Error deleting leave type ❌');        // <-- Alert
+      }
+    });
+  }
+
+  // Optional: close modal manually if needed
+  closeModal(modalId: string) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      bootstrap.Modal.getInstance(modalElement)?.hide();
+    }
+  }
 }

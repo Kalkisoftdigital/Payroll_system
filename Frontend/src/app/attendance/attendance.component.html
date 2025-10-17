@@ -1,0 +1,210 @@
+<app-nav-bar></app-nav-bar>
+
+<div class="main-wrapper mt-5">
+  <div class="page-wrapper">
+    <div class="content">
+
+      <!-- Navigation buttons -->
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <button class="btn btn-outline-dark" routerLink="/attendance">Attendance</button>
+        <button *ngIf="canViewAttendance || isSuperAdmin" class="btn btn-outline-dark" routerLink="/summary-attendance">
+          Summary Attendance
+        </button>
+      </div>
+
+      <!-- Header with "View All Attendance" button -->
+      <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+        <h5 class="fw-bold">Attendance</h5>
+        <button *ngIf="canViewAttendance || isSuperAdmin" class="btn btn-outline-primary btn-sm"
+          (click)="viewAllAttendance()">
+          <i class="ti ti-eye"></i> View All Attendance
+        </button>
+      </div>
+
+      <div class="row g-3">
+
+        <!-- Employee List (Hide when viewing all attendance) -->
+        <div class="col-md-4" *ngIf="!showAllAttendance && (isSuperAdmin || canManageAttendance)">
+          <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-0">
+              <h6 class="fw mb-0">Select Employee</h6>
+            </div>
+            <ul class="list-group list-group-flush" style="padding-left: 1rem;">
+              <li *ngFor="let emp of employees"
+                  class="list-group-item d-flex justify-content-between align-items-center"
+                  (click)="canViewEmployeeAttendance(emp) && selectEmployee(emp)"
+                  [class.selected]="selectedEmployee?.id === emp.id"
+                  [class.disabled]="!canViewEmployeeAttendance(emp)"
+                  style="cursor: pointer; border: none; padding: 0.5rem 0; background: transparent;">
+                <div class="fw-semibold text-primary" style="font-size: 0.9rem; position: relative;">
+                  {{ emp.firstname }} {{ emp.lastName }}
+                  <span *ngIf="selectedEmployee?.id === emp.id"
+                        style="display:block; width:100%; height:2px; background-color:#0d6efd; margin-top:2px;"></span>
+                </div>
+                <span class="badge rounded-pill" style="background: linear-gradient(90deg, #FFD97D, #FFF3CD); 
+                     color: #856404; font-weight: 500; padding: 0.3em 0.6em;">
+                  ID: {{ emp.id }}
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div [class.col-md-8]="!showAllAttendance" [class.col-md-12]="showAllAttendance">
+
+          <!-- Selected Employee Attendance -->
+          <div *ngIf="selectedEmployee && !showAllAttendance">
+            <div class="card border-light shadow-sm">
+              <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                  {{ selectedEmployee.firstname }} {{ selectedEmployee.lastName }} - Attendance
+                </h5>
+                <button *ngIf="canManageEmployeeAttendance(selectedEmployee)" class="btn btn-primary btn-sm"
+                  (click)="toggleAddForm()">
+                  <i class="ti ti-plus"></i> Add Attendance
+                </button>
+              </div>
+
+              <div class="card-body">
+                <!-- Attendance Table -->
+                <div class="table-responsive mb-4">
+                  <table class="table table-bordered table-hover text-center align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Date</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Shift</th>
+                        <th>Late Mark</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let att of displayedAttendance">
+                        <td>{{ att.date | date:'dd-MM-yyyy' }}</td>
+                        <td>{{ att.checkIn || '-' }}</td>
+                        <td>{{ att.checkOut || '-' }}</td>
+                        <td>{{ att.shift || '-' }}</td>
+                        <td>
+                          <span class="badge" [ngClass]="att.lateMark ? 'bg-danger' : 'bg-success'">
+                            {{ att.lateMark ? 'Yes' : 'No' }}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr *ngIf="displayedAttendance.length === 0">
+                        <td colspan="5" class="text-center text-muted">No attendance records found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Add Attendance Form -->
+                <div *ngIf="showAddForm" class="border-top pt-3">
+                  <h6 class="fw-semibold text-primary mb-3">
+                    <i class="ti ti-calendar-plus"></i> Add New Attendance (Today)
+                  </h6>
+                  <div class="row g-3">
+                    <div class="col-md-3">
+                      <label class="form-label fw-semibold">Date</label>
+                      <input type="date" class="form-control form-control-sm" [(ngModel)]="newAttendance.date" readonly>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label fw-semibold">Check In</label>
+                      <input type="time" class="form-control form-control-sm" [(ngModel)]="newAttendance.checkIn">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label fw-semibold">Check Out</label>
+                      <input type="time" class="form-control form-control-sm" [(ngModel)]="newAttendance.checkOut">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label fw-semibold">Shift</label>
+                      <select class="form-select form-select-sm" [(ngModel)]="newAttendance.shift">
+                        <option value="" disabled selected>Select shift</option>
+                        <option>6:00 AM - 12:00 PM</option>
+                        <option>12:00 PM - 6:00 PM</option>
+                        <option>6:00 PM - 12:00 AM</option>
+                        <option>12:00 AM - 6:00 AM</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label fw-semibold">Late Mark</label>
+                      <select class="form-select form-select-sm" [(ngModel)]="newAttendance.lateMark">
+                        <option [ngValue]="false">No</option>
+                        <option [ngValue]="true">Yes</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="text-end mt-3">
+                    <button class="btn btn-success btn-sm px-4" (click)="addAttendance()"
+                      [disabled]="!newAttendance.checkIn || !newAttendance.checkOut || !canManageEmployeeAttendance(selectedEmployee)">
+                      <i class="ti ti-check"></i> Save
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm ms-2" (click)="cancelAddForm()">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- All Employees Attendance -->
+          <div *ngIf="showAllAttendance">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">All Employees Attendance</h5>
+                <div class="d-flex gap-2">
+                  <label class="btn btn-outline-success mb-0"
+                         [ngClass]="{ 'disabled': !canManageAttendance && !authService.isSuperAdmin() }">
+                    <i class="ti ti-upload"></i> Import Attendance
+                    <input type="file" hidden (change)="onFileSelected($event)"
+                           [disabled]="!canManageAttendance && !authService.isSuperAdmin()">
+                  </label>
+                  <button class="btn btn-outline-secondary btn-sm" (click)="backToEmployees()">
+                    <i class="ti ti-arrow-left"></i> Back
+                  </button>
+                </div>
+              </div>
+
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover text-center align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Employee</th>
+                        <th>Date</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Shift</th>
+                        <th>Late Mark</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let att of attendance">
+                        <td>{{ att.empName }}</td>
+                        <td>{{ att.date | date:'dd-MM-yyyy' }}</td>
+                        <td>{{ att.checkIn || '-' }}</td>
+                        <td>{{ att.checkOut || '-' }}</td>
+                        <td>{{ att.shift || '-' }}</td>
+                        <td>
+                          <span class="badge" [ngClass]="att.lateMark ? 'bg-danger' : 'bg-success'">
+                            {{ att.lateMark ? 'Yes' : 'No' }}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr *ngIf="attendance.length === 0">
+                        <td colspan="6" class="text-center text-muted">No attendance records found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- End Right Column -->
+
+      </div> <!-- End Row -->
+
+    </div>
+  </div>
+</div>

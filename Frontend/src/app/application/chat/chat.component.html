@@ -1,5 +1,5 @@
 <app-nav-bar></app-nav-bar>
-<div class="main-wrapper">
+<div class="main-wrapper mt-5">
   <div class="page-wrapper">
     <div class="content">
       <div class="d-flex align-items-sm-center flex-sm-row flex-column gap-2 pb-3">
@@ -73,11 +73,11 @@
               <div class="user-details d-flex align-items-center">
                 <div class="avatar online me-2">
                   <img [src]="getEmployeeImage(selectedEmployee)" class="rounded-circle"
-                    alt="{{ selectedEmployee?.name }}" />
+                    alt="{{ selectedEmployee.name }}" />
                 </div>
                 <div class="d-flex flex-column">
                   <div>
-                    <h6 class="fw-medium mb-0">{{ selectedEmployee?.name }}</h6>
+                    <h6 class="fw-medium mb-0">{{ selectedEmployee.name }}</h6>
                   </div>
                   <small class="text-muted animate-typing">
                     is typing<span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -105,22 +105,20 @@
                       <i class="ti ti-clock-off me-2"></i>Disappearing Message
                     </a>
 
-                    <a class="dropdown-item" href="javascript:void(0)" (click)="clearMessages(selectedEmployee?.id!)">
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="clearMessages(selectedEmployee.id!)">
                       <i class="ti ti-trash me-2"></i> Clear Messages
                     </a>
 
-                    <a class="dropdown-item" href="javascript:void(0)" (click)="deleteChat(selectedEmployee?.id!)">
-                      <i class="ti ti-trash-x me-2"></i>Delete Chat
-                    </a>
+
 
                     <!-- Block / Unblock -->
-                    <a class="dropdown-item" href="javascript:void(0)" *ngIf="!selectedEmployee?.isBlocked"
-                      (click)="blockUser(selectedEmployee?.id!)">
+                    <a class="dropdown-item" href="javascript:void(0)" *ngIf="!selectedEmployee.isBlocked"
+                      (click)="blockUser(selectedEmployee.id!)">
                       <i class="ti ti-ban me-2"></i>Block
                     </a>
 
-                    <a class="dropdown-item" href="javascript:void(0)" *ngIf="selectedEmployee?.isBlocked"
-                      (click)="unblockUser(selectedEmployee?.id!)">
+                    <a class="dropdown-item" href="javascript:void(0)" *ngIf="selectedEmployee.isBlocked"
+                      (click)="unblockUser(selectedEmployee.id!)">
                       <i class="ti ti-user-check me-2"></i>Unblock
                     </a>
                   </div>
@@ -150,7 +148,7 @@
 
                     <!-- Sender -->
                     <small>
-                      <b>{{ msg.from === currentUserId ? 'You' : selectedEmployee?.name }}</b>
+                      <b>{{ msg.from === currentUserId ? 'You' : selectedEmployee.name }}</b>
                     </small>
 
                     <!-- Deleted message -->
@@ -202,9 +200,16 @@
                       <button (click)="replyMessage(msg)"><i class="ti ti-corner-up-left me-1"></i> Reply</button>
                       <button (click)="forwardMessage(msg)"><i class="ti ti-send me-1"></i> Forward</button>
                       <button (click)="copyMessage(msg)"><i class="ti ti-copy me-1"></i> Copy</button>
-                      <button (click)="markFavourite(msg)"><i class="ti ti-heart me-1"></i> Favourite</button>
-                      <button (click)="deletemessage(msg.id)"><i class="ti ti-trash me-1"></i> Delete</button>
-                      <button (click)="markUnread(msg)"><i class="ti ti-mail me-1"></i> Mark as Unread</button>
+                      <button (click)="markFavourite(msg)" [class.active]="msg.favourite">
+                        <i class="ti ti-heart me-1"></i> Favourite
+                      </button> <button (click)="deletemessage(msg.id)">
+                        <i class="ti ti-trash me-1"></i> Delete
+                      </button>
+
+
+                      <button (click)="markUnread(msg)" [class.active]="msg.unread">
+                        <i class="ti ti-mail me-1"></i> Mark as Unread
+                      </button>
                     </div>
                   </div>
 
@@ -225,8 +230,7 @@
 
                   <div class="form-wrap">
                     <input type="text" class="form-control" placeholder="Type Your Message" name="message"
-                      [(ngModel)]="newMessage" required autocomplete="off"
-                      [disabled]="selectedEmployee?.isBlocked ?? false" />
+                      [(ngModel)]="newMessage" required autocomplete="off" [disabled]="selectedEmployee.isBlocked " />
                   </div>
 
                   <div class="form-item custom-dropdown" #footerDropdown>
@@ -249,9 +253,9 @@
                   <div class="form-btn">
                     <button class="btn btn-primary" type="submit" [disabled]="
                         newMessage.trim().length === 0 ||
-                        selectedEmployee?.isBlocked
+                        selectedEmployee.isBlocked
                       " title="{{
-                        selectedEmployee?.isBlocked
+                        selectedEmployee.isBlocked
                           ? 'This user is blocked'
                           : 'Send'
                       }}">

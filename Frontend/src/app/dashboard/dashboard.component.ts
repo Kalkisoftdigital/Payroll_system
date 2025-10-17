@@ -1,7 +1,48 @@
-import { Component, OnInit, AfterViewInit, ViewChild, TemplateRef } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import * as ApexCharts from 'apexcharts';
-import * as c3 from 'c3';
+
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { EmployeesService, Employee } from '../Services/Employees-serives/employees.service';
+import { LeavesService } from '../Services/Leaves-services/leaves.service';
+import { SalaryService, Salary } from '../Services/Salary-services/salary.service';
+import { TeamService, Team } from '../Services/Team-services/team.service';
+import { Leave } from '../models/leave.model';
+import {
+  ApexAxisChartSeries,
+  ApexChart,
+  ApexXAxis,
+  ApexTitleSubtitle,
+  ApexDataLabels,
+  ApexResponsive,
+  ApexStroke
+} from "ng-apexcharts";
+import { AuthService } from '../Services/Auth-services/auth.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CompanyService } from '../Services/company_service/company.service';
+import { DepartmentService } from '../Services/Department-serives/department.service';
+
+// ✅ Attendance import
+import { AttendanceService, Attendance } from '../Services/Attendance-services/attendance.service';
+
+export type ChartOptions = {
+  series: ApexAxisChartSeries | number[];
+  chart: ApexChart;
+  xaxis?: ApexXAxis;
+  title?: ApexTitleSubtitle;
+  dataLabels?: ApexDataLabels;
+  labels?: string[];
+  responsive?: ApexResponsive[];
+  stroke?: ApexStroke;
+  tooltip?: any;
+  colors?: string[];
+};
+
+export interface StatCard {
+  title: string;
+  value: number | string;
+  route: string;
+  subCards?: { title: string; value: number; color?: string }[];
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -9,188 +50,386 @@ import * as c3 from 'c3';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
-  @ViewChild('deleteModal') deleteModal!: TemplateRef<any>;
-  
-  stats = [
-    { id: 1, title: 'Employees', bgClass: 'bg-teal', value: 85 },
-    { id: 2, title: 'Companies', bgClass: 'bg-warning', value: 75 },
-    { id: 3, title: 'Leaves', bgClass: 'bg-orange', value: 65 },
-    { id: 7, title: 'Salary', bgClass: 'bg-teal', value: 90 }
-  ];
- 
-  recentActivities = [
-    { name: 'John Carter', action: 'Added New Project HRMS Dashboard', time: '06:20 PM', img: 'employee-01.jpg' },
-    { name: 'Sophia White', action: 'Commented on Uploaded Document', time: '04:00 PM', img: 'employee-02.jpg' },
-    { name: 'Michael Johnson', action: 'Approved Task Projects', time: '02:30 PM', img: 'employee-03.jpg' },
-    { name: 'Emily Clark', action: 'Requesting Access to Module Tickets', time: '12:10 PM', img: 'employee-04.jpg' },
-    { name: 'David Anderson', action: 'Downloaded App Reports', time: '10:40 AM', img: 'employee-05.jpg' },
-    { name: 'Olivia Haris', action: 'Completed ticket module in HRMS', time: '09:50 AM', img: 'employee-06.jpg' }
-  ];
 
-  teamLeads = [
-    { name: 'Braun Kelton', team: 'PHP', email: 'braun@example.com', img: 'employee-03.jpg', badgeClass: 'teal' },
-    { name: 'Sarah Michelle', team: 'IOS', email: 'sarah@example.com', img: 'employee-06.jpg', badgeClass: 'pink' },
-    { name: 'Daniel Patrick', team: 'HTML', email: 'daniel@example.com', img: 'manager-07.jpg', badgeClass: 'orange' },
-    { name: 'Emily Clark', team: 'UI/UX', email: 'emily@example.com', img: 'employee-08.jpg', badgeClass: 'success' },
-    { name: 'Ryan Christopher', team: 'React', email: 'ryan@example.com', img: 'manager-05.jpg', badgeClass: 'info' }
-  ];
+  // ================== Variables ==================
+  totalEmployees = 0;
+  totalLeaves = 0;
+  approvedLeaves = 0;
+  pendingLeaves = 0;
+  rejectedLeaves = 0;
+  upcomingLeaves: (Leave & { employee?: Partial<Employee> })[] = [];
+  totalDepartments = 0;
+  totalTeams = 0;
+  totalSalary = 0;
+  loading = false;
+  errorMsg = '';
+  statCards: StatCard[] = [];
+  activeSubCardTitle: string | null = null;
+  leaveSearchTerm: string = '';
 
-  upcomingLeaves = [
-    { name: 'Daniel Martinz', date: '17 Apr 2025', type: 'Sick Leave', img: 'employee-09.jpg' },
-    { name: 'Emily Clark', date: '20 Apr 2025', type: 'Casual Leave', img: 'employee-04.jpg' },
-    { name: 'Daniel Patrick', date: '22 Apr 2025', type: 'Annual Leave', img: 'manager-03.jpg' },
-    { name: 'Sophia White', date: '28 Apr 2025', type: 'Sick Leave', img: 'employee-02.jpg' },
-    { name: 'Madison Andrew', date: '30 Apr 2025', type: 'Casual Leave', img: 'manager-09.jpg' }
-  ];
+  lineChartOptions: ChartOptions;
+  pieChartOptions: ChartOptions;
+  teamPieChartOptions: ChartOptions;
+  genderDonutChartOptions: {
+    series: number[];
+    chart: ApexChart;
+    labels: string[];
+    responsive: ApexResponsive[];
+    colors: string[];
+    legend: any;
+  } = {
+      series: [0, 0],
+      chart: { type: "donut", height: 280 },
+      labels: ["Male", "Female"],
+      responsive: [{ breakpoint: 480, options: { chart: { width: 220 }, legend: { position: "bottom" } } }],
+      colors: ["#749ac0ff", "#d378a5ff"],
+      legend: { position: "bottom" }
+    };
 
-  constructor(private modalService: NgbModal) { }
+  showCompanyForm = false;
+  companyForm!: FormGroup;
+  logoPreview: string | ArrayBuffer | null = null;
+  submitting = false;
 
-  ngOnInit(): void { }
+  showAddForm = false;
 
-  ngAfterViewInit(): void {
-    this.initCharts();
+  // ✅ Attendance form object
+  attendance: Partial<Attendance> = {
+    employeeId: 0,
+    empId: 0,
+    empName: '',
+    department: '',
+    date: new Date().toISOString().split('T')[0],
+    inTime: this.getCurrentTime(),
+    outTime: '',
+    shift: 'Morning',
+    lateMark: false
+  };
+  employees: any[] = [];
+
+  constructor(
+    private employeeService: EmployeesService,
+    private leaveService: LeavesService,
+    private salaryService: SalaryService,
+    private departmentService: DepartmentService,
+    private teamService: TeamService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    public authService: AuthService,
+    private fb: FormBuilder,
+    private companyService: CompanyService,
+    private attendanceService: AttendanceService // ✅ Inject service
+  ) {
+
+    // Line Chart
+    this.lineChartOptions = {
+      series: [{ name: 'Salary Records', data: Array(12).fill(0) }],
+      chart: { type: 'line', height: 350, toolbar: { show: true } },
+      xaxis: { categories: this.getMonthNames() },
+      title: { text: 'Salary Trends' },
+      dataLabels: { enabled: false },
+      labels: [],
+      responsive: [],
+      stroke: { curve: 'smooth' },
+      tooltip: { y: { formatter: (val: number) => this.formatSalary(val) } }
+    };
+
+    // Pie Charts
+    this.pieChartOptions = this.createPieChartOptions('Employees / Departments / Teams', ['#75e8f0ff', '#9b75beff', '#8bf0a1ff']);
+    this.teamPieChartOptions = this.createPieChartOptions('Team Distribution', ['#f35959ff', '#fcb448ff', '#c2b759ff', '#72db7dff', '#36a0b6ff', '#2a4c9cff']);
   }
 
-  initCharts(): void {
-    // Polar Area Chart
-    const polarChart = new ApexCharts(document.querySelector("#polarchart"), {
-      series: [44, 55, 67, 83],
-      chart: {
-        height: 250,
-        type: 'polarArea',
-      },
-      labels: ['Design', 'Development', 'Business', 'Testing'],
-      fill: {
-        opacity: 1
-      },
-      stroke: {
-        width: 1,
-        colors: undefined
-      },
-      colors: ['#5D87FF', '#FFAE1F', '#3DD9EB', '#FF5E5E'],
-      yaxis: {
-        show: false
-      },
-      legend: {
-        position: 'bottom'
-      },
-      plotOptions: {
-        polarArea: {
-          rings: {
-            strokeWidth: 0
-          },
-          spokes: {
-            strokeWidth: 0
-          },
-        }
-      },
-    });
-    polarChart.render();
+  ngOnInit(): void {
+    this.loadStats();
+    this.getEmployees();
 
-    // Applications Chart
-    const applicationsChart = new ApexCharts(document.querySelector("#applications_chart"), {
-      series: [{
-        name: 'Applications',
-        data: [44, 55, 57, 56, 61, 58, 63]
-      }],
-      chart: {
-        height: 250,
-        type: 'bar',
+    // Company Form
+    this.companyForm = this.fb.group({
+      name: ['', Validators.required],
+      logo: [null],
+      address: ['', Validators.required],
+      email: ['', [Validators.email]],
+      phone: [''],
+      website: ['']
+    });
+  }
+
+  ngAfterViewInit(): void { this.cdr.detectChanges(); }
+
+  get isSuperAdmin(): boolean {
+    return this.authService?.currentUserValue?.roleName === 'Super Admin';
+  }
+
+  private createPieChartOptions(title: string, colors: string[]): ChartOptions {
+    return {
+      series: [],
+      chart: { type: 'pie', height: 250 },
+      labels: [],
+      title: { text: title },
+      dataLabels: { enabled: true },
+      responsive: [{ breakpoint: 480, options: { chart: { width: 200 }, legend: { position: 'bottom' } } }],
+      stroke: { curve: 'smooth' },
+      xaxis: { categories: [] },
+      colors: colors
+    };
+  }
+
+  loadStats() {
+    this.loading = true;
+    forkJoin({
+      employees: this.employeeService.getEmployees(),
+      leaves: this.leaveService.getAllLeaves(),
+      salaries: this.salaryService.getSalaries(),
+      departments: this.departmentService.getDepartments(),
+      teams: this.teamService.getTeams()
+    }).subscribe({
+      next: ({ employees, leaves, salaries, departments, teams }) => {
+        const employeeMap = new Map<number, Employee>(employees.map(emp => [emp.id!, emp]));
+        this.totalEmployees = employees.length;
+        this.processLeaves(leaves, employeeMap);
+        this.totalSalary = salaries.reduce((sum, s) => sum + Number(s.total || 0), 0);
+        this.updateLineChart(salaries);
+        this.totalDepartments = departments.length;
+        this.totalTeams = teams.length;
+
+        this.pieChartOptions.series = [this.totalEmployees, this.totalDepartments, this.totalTeams];
+        this.pieChartOptions.labels = ['Employees', 'Departments', 'Teams'];
+
+        const teamEmployeeCount = (teams as Team[]).map(team => employees.filter(emp => emp.team === team.name).length);
+        this.teamPieChartOptions.labels = (teams as Team[]).map(t => t.name);
+        this.teamPieChartOptions.series = teamEmployeeCount;
+
+        const maleCount = employees.filter(emp => emp.gender?.toLowerCase() === 'male').length;
+        const femaleCount = employees.filter(emp => emp.gender?.toLowerCase() === 'female').length;
+        this.genderDonutChartOptions.series = [maleCount, femaleCount];
+
+        this.updateCards();
+        setTimeout(() => this.cdr.detectChanges(), 100);
+        this.loading = false;
       },
-      colors: ['#5D87FF'],
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '55%',
-          endingShape: 'rounded'
-        },
+      error: () => { this.errorMsg = 'Error fetching dashboard data'; this.loading = false; }
+    });
+  }
+
+  private processLeaves(leaves: Leave[], employeeMap: Map<number, Employee>) {
+    this.totalLeaves = leaves.length;
+    this.approvedLeaves = leaves.filter(l => l.status.toLowerCase() === 'approved').length;
+    this.pendingLeaves = leaves.filter(l => l.status.toLowerCase() === 'pending').length;
+    this.rejectedLeaves = leaves.filter(l => l.status.toLowerCase() === 'rejected').length;
+
+    this.upcomingLeaves = leaves
+      .filter(l => new Date(l.start_date) > new Date())
+      .map(l => ({ ...l, employee: employeeMap.get(l.employee_id) ?? { firstname: 'Unknown', lastName: '', team: '', role: '' } }))
+      .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
+  }
+
+  toggleSubCards(card: StatCard) { this.activeSubCardTitle = this.activeSubCardTitle === card.title ? null : card.title; }
+
+  navigateToCard(card: StatCard) {
+    if (!card.subCards || card.subCards.length === 0) this.router.navigate([card.route]);
+    else this.toggleSubCards(card);
+  }
+
+  navigateToSubCard(card: any, sub: { title: string }) {
+    const routesMap: { [key: string]: string } = {
+      'Approved': '/leaves', 'Pending': '/leaves', 'Rejected': '/leaves',
+      'Fund Master': '/fund-master', 'Salary Payroll': '/salary'
+    };
+    const route = routesMap[sub.title] || card.route;
+    this.router.navigate([route]);
+  }
+
+updateCards() {
+  this.statCards = [
+    { title: 'Employees', value: this.totalEmployees, route: '/employees' },
+    {
+      title: 'Leaves',
+      value: this.totalLeaves,
+      route: '/leaves',
+      subCards: [
+        { title: 'Approved', value: this.approvedLeaves, color: '#55f179ff' },
+        { title: 'Pending', value: this.pendingLeaves, color: '#f5ca4bff' },
+        { title: 'Rejected', value: this.rejectedLeaves, color: '#f8606fff' }
+      ]
+    },
+    {
+      title: 'Salary Records',
+      value: this.formatSalary(this.totalSalary),
+      route: '/salary',
+      subCards: [
+        ...(this.isSuperAdmin ? [{ title: 'Fund Master', value: 1, color: '#007bff' }] : []),
+        { title: 'Salary Payroll', value: 1, color: '#4cec71ff' }
+      ]
+    },
+    ...(this.isSuperAdmin ? [{ title: 'Departments', value: this.totalDepartments, route: '/departments' }] : []),
+    ...(this.isSuperAdmin ? [{ title: 'Teams', value: this.totalTeams, route: '/employee-team' }] : []),
+    ...(this.canViewReports ? [{ title: 'Reports', value: 0, route: '/reports' }] : [])
+  ];
+}
+
+  formatSalary(amount: number): string {
+    if (!amount) return '0';
+    amount = Math.round(amount * 100) / 100;
+    if (amount >= 1_00_00_000) return (amount / 1_00_00_000).toFixed(2) + 'M';
+    if (amount >= 1_00_000) return (amount / 1_00_000).toFixed(2) + 'L';
+    return amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  filteredLeaves(): (Leave & { employee?: Partial<Employee> })[] {
+    if (!this.leaveSearchTerm) return this.upcomingLeaves;
+    const term = this.leaveSearchTerm.toLowerCase();
+    return this.upcomingLeaves.filter(l =>
+      (l.employee?.firstname?.toLowerCase().includes(term) ?? false) ||
+      (l.employee?.lastName?.toLowerCase().includes(term) ?? false) ||
+      (l.leave_type?.toLowerCase().includes(term) ?? false)
+    );
+  }
+
+  private updateLineChart(salaries: Salary[]) {
+    const monthNames = this.getMonthNames();
+    const salaryByMonth: { [key: number]: number } = {};
+    salaries.forEach(s => {
+      const month = new Date(s.date).getMonth();
+      salaryByMonth[month] = (salaryByMonth[month] || 0) + (s.total || 0);
+    });
+    this.lineChartOptions.series = [{ name: 'Salary Records', data: monthNames.map((_, idx) => salaryByMonth[idx] || 0) }];
+    this.lineChartOptions.xaxis = { categories: monthNames };
+  }
+
+  private getMonthNames(): string[] {
+    return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  }
+
+  // ================= Company Form Methods =================
+  toggleCompanyForm() { this.showCompanyForm = !this.showCompanyForm; if (!this.showCompanyForm) this.resetForm(); }
+
+  onLogoChange(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Only JPG or PNG files are allowed!');
+      this.companyForm.patchValue({ logo: null });
+      this.logoPreview = null;
+      return;
+    }
+
+    this.companyForm.patchValue({ logo: file });
+    this.companyForm.get('logo')?.updateValueAndValidity();
+
+    const reader = new FileReader();
+    reader.onload = () => this.logoPreview = reader.result;
+    reader.readAsDataURL(file);
+  }
+
+  submitCompanyForm() {
+    if (this.companyForm.invalid) { this.companyForm.markAllAsTouched(); return; }
+    this.submitting = true;
+    const formData = new FormData();
+    Object.keys(this.companyForm.controls).forEach(key => {
+      const value = this.companyForm.get(key)?.value;
+      if (value) formData.append(key, value);
+    });
+    this.companyService.saveCompany(formData).subscribe({
+      next: res => { alert('Company details saved!'); this.toggleCompanyForm(); this.submitting = false; },
+      error: err => { console.error(err); alert('Error saving company details!'); this.submitting = false; }
+    });
+  }
+
+  resetForm() { this.companyForm.reset(); this.logoPreview = null; }
+  get f() { return this.companyForm.controls; }
+
+  // ================= Attendance Methods =================
+  getEmployees() {
+    fetch('http://localhost:3000/api/employees')
+      .then(res => res.json())
+      .then(data => { this.employees = data; console.log('Employees loaded:', this.employees); })
+      .catch(err => console.error('Error fetching employees:', err));
+  }
+
+
+  saveAttendance() {
+    if (!this.attendance.employeeId) {
+      alert('Please select an employee!');
+      return;
+    }
+
+    // ✅ Safe access with number conversion
+    const selectedEmp = this.employees.find(e => e.id === Number(this.attendance.employeeId));
+    if (!selectedEmp) {
+      alert('Selected employee not found!');
+      return;
+    }
+    const payload: Attendance = {
+      employeeId: selectedEmp.id,
+      empId: selectedEmp.id,
+      empName: selectedEmp.firstname + ' ' + selectedEmp.lastName,
+      department: selectedEmp.department || '',
+      date: this.attendance.date || new Date().toISOString().split('T')[0],
+      checkIn: this.attendance.inTime || this.getCurrentTime(),
+      checkOut: this.attendance.outTime || '',
+      shift: this.attendance.shift || 'Morning',
+      lateMark: this.attendance.lateMark ?? false // boolean fallback
+    };
+
+    this.attendanceService.addAttendance(payload).subscribe({
+      next: () => {
+        alert('Attendance added successfully!');
+        this.toggleAddForm();
+        this.resetAttendanceForm();
+        this.router.navigate(['/attendance']);
       },
-      dataLabels: {
-        enabled: false
-      },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent']
-      },
-      xaxis: {
-        categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      },
-      fill: {
-        opacity: 1
-      },
-      tooltip: {
-        y: {
-          formatter: function(val: string) {
-            return val + " applications";
-          }
-        }
+      error: (err) => {
+        console.error(err);
+        alert('Error adding attendance!');
       }
     });
-    applicationsChart.render();
-
-    // Circle Charts
-    this.stats.forEach(stat => {
-      c3.generate({
-        bindto: `#circle_chart_${stat.id}`,
-        data: {
-          columns: [['data', stat.value]],
-          type: 'gauge',
-        },
-        color: {
-          pattern: ['#5D87FF'],
-          threshold: {
-            values: [30, 60, 90]
-          }
-        },
-        size: {
-          height: 80,
-          width: 80
-        }
-      });
-    });
-
-    // Gender Charts
-    c3.generate({
-      bindto: '#chart_male',
-      data: {
-        columns: [['Male', 65]],
-        type: 'gauge',
-      },
-      color: {
-        pattern: ['#5D87FF'],
-      },
-      size: {
-        height: 120
-      }
-    });
-
-    c3.generate({
-      bindto: '#chart_female',
-      data: {
-        columns: [['Female', 35]],
-        type: 'gauge',
-      },
-      color: {
-        pattern: ['#FFAE1F'],
-      },
-      size: {
-        height: 120
-      }
-    });
   }
 
-  refreshActivities(): void {
-    console.log('Refreshing activities...');
-    // API call would go here
+
+  resetAttendanceForm() {
+    this.attendance = {
+      employeeId: 0,
+      empId: 0,
+      empName: '',
+      department: '',
+      date: new Date().toISOString().split('T')[0],
+      inTime: '',
+      outTime: '',
+      shift: 'Morning',
+      lateMark: false
+    };
   }
 
-  openDeleteModal(): void {
-    this.modalService.open(this.deleteModal, { centered: true, size: 'sm' });
+  getCurrentTime(): string {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+  toggleAddForm() {
+    this.showAddForm = !this.showAddForm;
+    if (this.showAddForm) {
+      this.attendance = {
+        employeeId: 0,
+        empId: 0,
+        empName: '',
+        department: '',
+        date: new Date().toISOString().split('T')[0],
+        inTime: this.getCurrentTime(),
+        outTime: '',
+        shift: 'Morning',
+        lateMark: false
+      };
+    }
   }
 
-  confirmDelete(): void {
-    console.log('Item deleted');
-    this.modalService.dismissAll();
-  }
+
+get canViewReports(): boolean {
+  const perm = this.authService.getPermissions();
+  return this.isSuperAdmin || perm?.can_report_action === 1;
+}
+
+
 }

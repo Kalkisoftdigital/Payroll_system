@@ -7,20 +7,10 @@
     <div class="page-container topbar-menu">
         <div class="d-flex align-items-center gap-2">
 
-            <!-- Logo -->
-            <a href="index.html" class="logo">
-
-                <!-- Logo Normal -->
-                <span class="logo-light">
-                    <span class="logo-lg"><img src="assets/img/logo.svg" alt="logo"></span>
-                    <span class="logo-sm"><img src="assets/img/logo-small.svg" alt="small logo"></span>
-                </span>
-
-                <!-- Logo Dark -->
-                <span class="logo-dark">
-                    <span class="logo-lg"><img src="assets/img/logo-white.svg" alt="dark logo"></span>
-                </span>
+            <a routerLink="/dashboard" class="logo d-flex align-items-center gap-2 text-decoration-none">
+                <span class="fw-bold company-name">{{ company?.name || 'Kalkisoft' }}</span>
             </a>
+
             <!-- Sidebar Mobile Button -->
             <a id="mobile_btn" class="mobile-btn" href="#sidebar">
                 <i class="ti ti-menu-deep fs-24"></i>
@@ -31,258 +21,45 @@
             </button>
 
         </div>
-
         <div class="d-flex align-items-center">
-            <!-- Full Screen -->
-            <div class="header-item">
-                <div class="me-2">
 
-                    <button class="btn topbar-link" (click)="toggleFullscreen()" type="button">
-                        <i class="ti ti-maximize fs-16"></i>
-                    </button>
-                </div>
-            </div>
-            <!-- Light/Dark Mode Button -->
-            <div class="header-item d-none d-sm-flex me-2">
-                <button class="topbar-link btn btn-icon topbar-link" id="light-dark-mode" type="button">
-                    <i class="ti ti-moon fs-16"></i>
-                </button>
-            </div>
 
-            <!-- Calendar -->
+            <!-- welcome -->
             <div class="header-item">
-                <div class="me-2">
-                    <a href="report-calendar" class="btn topbar-link"><i class="ti ti-calendar-star fs-16"></i></a>
+                <div class="d-flex align-items-center px-3">
+                    <i class="ti ti-user-circle fs-20 me-2"></i>
+                    <span class="fw-semibold welcome-text">
+                        Welcome, {{ user?.name || user?.firstName || user?.username }} ({{ userRole || 'Employee' }})
+                    </span>
+
                 </div>
             </div>
 
-            <!-- Notification Dropdown -->
-            <div class="header-item">
-                <div class="dropdown me-2">
-
-                    <button class="topbar-link btn btn-icon topbar-link dropdown-toggle drop-arrow-none"
-                        data-bs-toggle="dropdown" data-bs-offset="0,24" type="button" aria-haspopup="false"
-                        aria-expanded="false">
-                        <i class="ti ti-bell fs-16 animate-ring fs-16"></i>
-                        <span class="notification-badge"></span>
-                    </button>
-
-                    <div class="dropdown-menu p-0 dropdown-menu-end dropdown-menu-lg" style="min-height: 300px;">
-
-                        <div class="p-2 border-bottom">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <h6 class="m-0 fs-16 fw-semibold"> Notifications</h6>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Notification Body -->
-                        <div class="notification-body position-relative z-2 rounded-0" data-simplebar>
-
-                            <!-- Item-->
-                            <div class="dropdown-item notification-item py-3 text-wrap border-bottom"
-                                id="notification-1">
-                                <div class="d-flex">
-                                    <div class="me-2 position-relative flex-shrink-0">
-                                        <img src="assets/img/users/avatar-2.jpg" class="avatar-md rounded-circle"
-                                            alt="">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="mb-0 fw-medium text-dark">Daniel Martinz</p>
-                                        <p class="mb-1 text-wrap">
-                                            <span class="fw-medium text-dark">Daniel Martinz</span> equested
-                                            Sick Leave from May 28 2025 to May 29 2025
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fs-12"><i class="ti ti-clock me-1"></i>4 min ago</span>
-                                            <div class="notification-action d-flex align-items-center float-end gap-2">
-                                                <a href="javascript:void(0);"
-                                                    class="notification-read rounded-circle bg-danger"
-                                                    data-bs-toggle="tooltip" title=""
-                                                    data-bs-original-title="Make as Read" aria-label="Make as Read"></a>
-                                                <button class="btn rounded-circle p-0"
-                                                    data-dismissible="#notification-1">
-                                                    <i class="ti ti-x"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Item-->
-                            <div class="dropdown-item notification-item py-3 text-wrap border-bottom"
-                                id="notification-2">
-                                <div class="d-flex">
-                                    <div class="me-2 position-relative flex-shrink-0">
-                                        <img src="assets/img/users/user-02.jpg" class="avatar-md rounded-circle" alt="">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="mb-0 fw-medium text-dark">Emily Clark</p>
-                                        <p class="mb-1 text-wrap">
-                                            Leave for <span class="fw-medium text-dark"> Emily Clark</span> has
-                                            been approved.
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fs-12"><i class="ti ti-clock me-1"></i>8 min ago</span>
-                                            <div class="notification-action d-flex align-items-center float-end gap-2">
-                                                <a href="javascript:void(0);"
-                                                    class="notification-read rounded-circle bg-danger"
-                                                    data-bs-toggle="tooltip" title=""
-                                                    data-bs-original-title="Make as Read" aria-label="Make as Read"></a>
-                                                <button class="btn rounded-circle p-0"
-                                                    data-dismissible="#notification-2">
-                                                    <i class="ti ti-x"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Item-->
-                            <div class="dropdown-item notification-item py-3 text-wrap border-bottom"
-                                id="notification-3">
-                                <div class="d-flex">
-                                    <div class="me-2 position-relative flex-shrink-0">
-                                        <img src="assets/img/users/user-04.jpg" class="avatar-md rounded-circle" alt="">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="mb-0 fw-medium text-dark"> David</p>
-                                        <p class="mb-1 text-wrap">
-                                            Leave request from <span class="fw-medium text-dark">David
-                                                Anderson</span>has been rejected.
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fs-12"><i class="ti ti-clock me-1"></i>15 min
-                                                ago</span>
-                                            <div class="notification-action d-flex align-items-center float-end gap-2">
-                                                <a href="javascript:void(0);"
-                                                    class="notification-read rounded-circle bg-danger"
-                                                    data-bs-toggle="tooltip" title=""
-                                                    data-bs-original-title="Make as Read" aria-label="Make as Read"></a>
-                                                <button class="btn rounded-circle p-0"
-                                                    data-dismissible="#notification-3">
-                                                    <i class="ti ti-x"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Item-->
-                            <div class="dropdown-item notification-item py-3 text-wrap" id="notification-4">
-                                <div class="d-flex">
-                                    <div class="me-2 position-relative flex-shrink-0">
-                                        <img src="assets/img/users/user-24.jpg" class="avatar-md rounded-circle" alt="">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="mb-0 fw-medium text-dark">Ann McClure</p>
-                                        <p class="mb-1 text-wrap">
-                                            cancelled her appointment scheduled for <span
-                                                class="fw-medium text-dark">February 5, 2024</span>
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fs-12"><i class="ti ti-clock me-1"></i>20 min
-                                                ago</span>
-                                            <div class="notification-action d-flex align-items-center float-end gap-2">
-                                                <a href="javascript:void(0);"
-                                                    class="notification-read rounded-circle bg-danger"
-                                                    data-bs-toggle="tooltip" title=""
-                                                    data-bs-original-title="Make as Read" aria-label="Make as Read"></a>
-                                                <button class="btn rounded-circle p-0"
-                                                    data-dismissible="#notification-4">
-                                                    <i class="ti ti-x"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <!-- View All-->
-                        <div class="p-2 rounded-bottom border-top text-center">
-                            <a href="notifications.html" class="text-center text-decoration-underline fs-14 mb-0">
-                                View All Notifications
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings -->
-            <div class="header-item">
-                <!-- <div>
-                            <a href="settings.html" class="btn topbar-link"><i class="ti ti-settings fs-16"></i></a>
-                        </div> -->
-                <div class="header-item dropdown">
-                    <button class="btn topbar-link" type="button" id="settingsDropdown" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="ti ti-settings" style="font-size: 16px;"></i>
-                    </button>
-
-                    <ul class="dropdown-menu dropdown-menu-end shadow mt-2" aria-labelledby="settingsDropdown"
-                        style="min-width: 220px;">
-
-                        <span class="text-center d-block p-3 border-bottom profile-header">
-                            <img src="https://i.pravatar.cc/60?img=12" alt="User" class="rounded-circle mb-2" width="60"
-                                height="60">
-                            <div class="fw-semibold">Joseph Smith</div>
-                            <small class="text-muted">Administrator</small>
-                        </span>
-
-                        <span class="dropdown-divider d-block">
-                            <hr>
-                        </span>
-
-                        <span><a class="dropdown-item" routerLink="/profile/profile" routerLinkActive="active"><i class="ti ti-user me-2"></i>
-                                Profile</a></span>
-                        <span><a class="dropdown-item" routerLink="/profile/lock-screen" routerLinkActive="active"><i class="ti ti-lock me-2"></i>
-                                Lock Screen</a></span>
-                        <span> <a class="dropdown-item" routerLink="/profile/forgot-password" routerLinkActive="active">
-                                <i class="ti ti-lock-exclamation me-2"></i><span>Forgot Password</span>
-                            </a></span>
-                        <span><a class="dropdown-item" routerLink="/profile/reset-password" routerLinkActive="active">
-                                <i class="ti ti-restore me-2"></i><span>Reset Password</span>
-                            </a></span>
-                        <span><a class="dropdown-item text-danger" href="login"><i class="ti ti-logout me-2"></i>
-                                Logout</a></span>
-
-                    </ul>
-                </div>
-
-            </div>
         </div>
     </div>
 
-</header>
-
-<!-- Sidenav Menu Start -->
+</header><!-- Sidenav Menu Start -->
 <div class="sidebar" id="sidebar">
 
     <!-- Start Logo -->
     <div class="sidebar-logo">
         <div>
             <!-- Logo Normal -->
-            <a href="index.html" class="logo logo-normal">
-                <img src="assets/img/logo.svg" alt="Logo">
+            <a routerLink="/dashboard" class="logo logo-normal">
+                <img [src]="company?.logo || 'assets/img/kalkisoft.webp'" alt="Company Logo">
             </a>
 
             <!-- Logo Small -->
-            <a href="index.html" class="logo-small">
-                <img src="assets/img/logo-small.svg" alt="Logo">
+            <a routerLink="/dashboard" class="logo-small">
+                <img [src]="company?.logo || 'assets/img/kalkisoft.webp'" alt="Company Logo">
             </a>
 
             <!-- Logo Dark -->
-            <a href="index.html" class="dark-logo">
-                <img src="assets/img/logo-white.svg" alt="Logo">
+            <a routerLink="/dashboard" class="dark-logo">
+                <img [src]="company?.logo || 'assets/img/kalkisoft.webp'" alt="Company Logo">
             </a>
         </div>
+
         <button class="sidenav-toggle-btn btn p-0" id="toggle_btn">
             <i class="ti ti-chevron-left-pipe"></i>
         </button>
@@ -301,17 +78,20 @@
                 <li>
                     <ul>
                         <li>
-                            <a href="dashboard" class="active">
+                            <a routerLink="/dashboard" routerLinkActive="active">
                                 <i class="ti ti-layout-dashboard"></i>
                                 <span>Dashboard</span>
                             </a>
+
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="active">
+                            <a class="d-flex align-items-center" (click)="toggleApplications()" style="cursor:pointer">
                                 <i class="ti ti-apps me-1"></i> <span>Applications</span>
+                                <i class="ms-auto ti"
+                                    [ngClass]="applicationsOpen ? 'ti-chevron-down' : 'ti-chevron-right'"></i>
                             </a>
 
-                            <ul class="list-unstyled ps-3">
+                            <ul class="list-unstyled ps-3" *ngIf="applicationsOpen">
                                 <li>
                                     <a class="nav-link px-0 d-flex align-items-center gap-2"
                                         routerLink="/application/chat" routerLinkActive="active">
@@ -321,7 +101,7 @@
                                 </li>
                                 <li>
                                     <a class="nav-link px-0 d-flex align-items-center gap-2"
-                                        routerLink="report-calendar" routerLinkActive="active">
+                                        routerLink="/application/calendar" routerLinkActive="active">
                                         <i class="ti ti-calendar-event"></i>
                                         <span>Calendar</span>
                                     </a>
@@ -333,87 +113,104 @@
                                         <span>Notes</span>
                                     </a>
                                 </li>
+
                             </ul>
                         </li>
-
 
                     </ul>
                 </li>
                 <li>
                     <ul>
-                        <li>
-                            <a href="departments">
-                                <i class="ti ti-building-community"></i><span>Department</span>
+
+                        <li *ngIf="canViewDepartment">
+                            <a routerLink="/departments">
+                                <i class="ti ti-building-community"></i>
+                                <span>Department</span>
                             </a>
                         </li>
                         <li>
-                            <a href="employees">
+                            <a routerLink="/employees" routerLinkActive="active">
                                 <i class="ti ti-users-group"></i><span>Employee</span>
                             </a>
                         </li>
                         <li>
-                            <a href="leaves">
+                            <a routerLink="/attendance" routerLinkActive="active">
+                                <i class="ti ti-calendar-star"></i><span>Attendance</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a routerLink="/leaves" routerLinkActive="active">
                                 <i class="ti ti-calendar-star"></i><span>Leaves</span>
                             </a>
                         </li>
+
                     </ul>
                 </li>
                 <li>
                     <ul>
-                        <li>
-                            <a href="salary">
-                                <i class="ti ti-calendar-event"></i><span>Salary</span>
+                        <li class="nav-item">
+                            <a class="d-flex align-items-center" (click)="toggleSalary()" style="cursor:pointer">
+                                <i class="ti ti-calendar-event me-1"></i>
+                                <span>Payroll</span>
+                                <i class="ms-auto ti"
+                                    [ngClass]="salaryOpen ? 'ti-chevron-down' : 'ti-chevron-right'"></i>
                             </a>
+
+                            <ul class="list-unstyled ps-3" *ngIf="salaryOpen">
+                                <li>
+                                    <a class="nav-link px-0 d-flex align-items-center gap-2" routerLink="/salary"
+                                        routerLinkActive="active">
+                                        <i class="ti ti-wallet"></i>
+                                        <span>Salary Payroll</span>
+                                    </a>
+                                </li>
+                                <li *ngIf="authService.isSuperAdmin()">
+                                    <a routerLink="/fund-master" routerLinkActive="active">
+                                        <i class="ti ti-cash"></i>
+                                        <span>Fund Master</span>
+                                    </a>
+                                </li>
+
+                            </ul>
                         </li>
-                        <li>
-                            <a href="/reports">
-                                <i class="ti ti-report"></i><span>Reports</span>
+                    
+                        <li *ngIf="canViewReports">
+                            <a routerLink="/reports" routerLinkActive="active">
+                                <i class="ti ti-report"></i>
+                                <span>Reports</span>
                             </a>
                         </li>
 
-                         <li>
-                            <a href="/manage">
+                        <li *ngIf="authService.isSuperAdmin()">
+                            <a routerLink="/roles" routerLinkActive="active">
                                 <i class="ti ti-report"></i><span>Manage</span>
                             </a>
                         </li>
+                        <li *ngIf="authService.isSuperAdmin()">
+                            <a routerLink="/permission-chart" routerLinkActive="active">
+                                <i class="ti ti-report"></i><span>Permission-chart</span>
+                            </a>
+                        </li>
+                        <li *ngIf="authService.isSuperAdmin()">
+                            <a routerLink="/company" routerLinkActive="active">
+                                <i class="ti ti-report"></i><span>Company</span>
+                            </a>
+                        </li>
 
                     </ul>
                 </li>
                 <li>
                     <ul>
                         <li>
-                            <a href="dashboard-setting.html">
-                                <i class="ti ti-settings"></i><span>Settings</span>
-                            </a>
+                            <button class="btn btn-danger w-100" (click)="logout()">
+                                <i class="ti ti-logout-2 me-1"></i>Logout
+                            </button>
+
+
                         </li>
                     </ul>
                 </li>
                 <li>
-                    <ul>
-                        <li>
-                            <a href="login">
-                                <i class="ti ti-login"></i><span>Login</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <ul>
-                        <li class="submenu">
-                            <a href="javascript:void(0);">
-                                <i class="ti ti-chart-donut"></i>
-                                <span>Charts</span><span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="chart-apex.html">Apex Charts</a></li>
-                                <li><a href="chart-c3.html">Chart C3</a></li>
-                                <li><a href="chart-js.html">Chart Js</a></li>
-                                <li><a href="chart-morris.html">Morris Charts</a></li>
-                                <li><a href="chart-flot.html">Flot Charts</a></li>
-                                <li><a href="chart-peity.html">Peity Charts</a></li>
-                            </ul>
-                        </li>
-                    </ul>
                 </li>
             </ul>
         </div>
@@ -428,9 +225,7 @@
                 </div>
             </div>
         </div> -->
-        <div class="p-3 pt-0">
-            <a href="login" class="btn btn-danger w-100"><i class="ti ti-logout-2 me-1"></i>Logout</a>
-        </div>
+
     </div>
 
 </div>

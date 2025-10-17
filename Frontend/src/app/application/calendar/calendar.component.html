@@ -1,146 +1,100 @@
 <app-nav-bar></app-nav-bar>
-
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-2 bg-light min-vh-100 p-3">
-      <h6 class="fw-bold mb-4">Sidebar</h6>
-      <ul class="nav flex-column">
-        <li class="nav-item"><a href="#" class="nav-link">Dashboard</a></li>
-        <li class="nav-item"><a href="#" class="nav-link active">Calendar</a></li>
-        <li class="nav-item"><a href="#" class="nav-link">Employees</a></li>
-        <!-- Add more sidebar links here -->
-      </ul>
-    </div>
-
-    <!-- Main Content -->
-    <div class="col-md-10">
-      <div class="container-fluid mt-4">
-        <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h4 class="fw-bold">Calendar</h4>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Calendar</li>
-              </ol>
-            </nav>
-          </div>
-          <button class="btn btn-primary" (click)="openAddEventModal()">
-            <i class="ti ti-circle-plus me-1"></i> New Event
+<div class="main-wrapper mt-5">
+  <div class="page-wrapper">
+    <div class="content container-fluid">
+      <div class="row">
+        <!-- Header with Add Event Button -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="fw-bold">Calendar</h4>
+          <button *ngIf="isEditable" class="btn btn-primary btn-sm" (click)="openAddEventModal()">
+            + Add Event
           </button>
         </div>
 
-        <!-- Main Calendar Layout -->
-        <div class="row">
-          <!-- Draggable Events & Categories -->
-          <div class="col-lg-3">
-            <div class="card mb-4">
-              <div class="card-body">
-                <h6 class="fw-bold mb-3">Draggable Events</h6>
-
-                <div class="border rounded px-3 py-2 mb-2 bg-light">
-                  <i class="ti ti-point-filled text-success me-2"></i> Holiday
-                </div>
-                <div class="border rounded px-3 py-2 mb-2 bg-light">
-                  <i class="ti ti-point-filled text-danger me-2"></i> Meeting
-                </div>
-                 <div class="border rounded px-3 py-2 mb-2 bg-light">
-                  <i class="ti ti-point-filled text-secondary me-2"></i> Interview
-                </div>
-                <div class="border rounded px-3 py-2 mb-2 bg-light">
-                  <i class="ti ti-point-filled text-info me-2"></i> Training
-                </div>
-
-                <div class="form-check my-3">
-                  <input type="checkbox" class="form-check-input" id="remove-after-drop">
-                  <label class="form-check-label" for="remove-after-drop">Remove after drop</label>
-                </div>
-
-                <button class="btn btn-outline-primary w-100" (click)="openCategoryModal()">
-                  <i class="ti ti-circle-plus me-1"></i> New Category
-                </button>
-              </div>
+        <!-- Sidebar Filters -->
+        <div class="col-md-3 col-lg-3 col-xl-2 mt-3">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h6 class="fw-bold mb-3">Event Categories</h6>
+              <ul class="list-unstyled">
+                <li class="filter-row" (click)="filterEventsByCategory('Holiday')">
+                  <i class="ti ti-point-filled text-success me-2"></i> Holidays
+                </li>
+                <li class="filter-row" (click)="filterEventsByCategory('Meeting')">
+                  <i class="ti ti-point-filled text-danger me-2"></i> Meetings
+                </li>
+                <li class="filter-row" (click)="filterEventsByCategory('Interview')">
+                  <i class="ti ti-point-filled text-warning me-2"></i> Interviews
+                </li>
+                <li class="filter-row" (click)="filterEventsByCategory('Training')">
+                  <i class="ti ti-point-filled text-primary me-2"></i> Trainings
+                </li>
+                <li class="filter-row" (click)="filterEventsByCategory('Leave')">
+                  <i class="ti ti-point-filled text-secondary me-2"></i> Leaves
+                </li>
+              </ul>
+              <button class="btn btn-secondary btn-sm w-100 mt-3" (click)="loadAllEvents()">Show All</button>
             </div>
           </div>
+        </div>
 
-          <!-- FullCalendar Component -->
-          <div class="col-lg-9">
-            <div class="card">
-              <div class="card-body">
-                <full-calendar [options]="calendarOptions"></full-calendar>
-              </div>
+        <!-- Calendar -->
+        <div class="col-md-9 col-lg-9 col-xl-10">
+          <div class="card shadow-sm rounded-3">
+            <div class="card-body">
+              <full-calendar [options]="calendarOptions"></full-calendar>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Modals -->
-      <!-- Add Event Modal -->
-      <div class="modal fade" id="add_event" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h6 class="modal-title">Add New Event</h6>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <div class="mb-3">
-                <label class="form-label">Event Name</label>
-                <input type="text" class="form-control">
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Event Date</label>
-                <input type="date" class="form-control">
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Event Category</label>
-                <select class="form-select">
-                  <option>Holiday</option>
-                  <option>Meeting</option>
-                </select>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button class="btn btn-primary">Add Event</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add Category Modal -->
-      <div class="modal fade" id="add_category" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h6 class="modal-title">Add New Category</h6>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <div class="mb-3">
-                <label class="form-label">Category Name</label>
-                <input type="text" class="form-control">
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Color</label>
-                <select class="form-select">
-                  <option value="success">Green</option>
-                  <option value="danger">Red</option>
-                  <option value="info">Blue</option>
-                  <option value="warning">Yellow</option>
-                </select>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button class="btn btn-primary">Add Category</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- End Modals -->
     </div>
   </div>
+
+  <!-- Add Event Modal -->
+  <div class="modal fade" id="add_event" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form (ngSubmit)="onSubmitAddEvent()" #addEventForm="ngForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Event / Holiday</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Event Title</label>
+              <input name="title" [(ngModel)]="addEventModel.title" required class="form-control" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Category</label>
+              <select name="category" [(ngModel)]="addEventModel.category"
+                (change)="onCategoryChange(($any($event.target)).value)" class="form-select" required>
+                <option value="Holiday">Holiday</option>
+                <option value="Meeting">Meeting</option>
+                <option value="Interview">Interview</option>
+                <option value="Training">Training</option>
+                <option value="Leave">Leave</option>
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">From Date</label>
+                <input name="start_date" [(ngModel)]="addEventModel.start_date" type="date" class="form-control"
+                  required />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">To Date</label>
+                <input name="end_date" [(ngModel)]="addEventModel.end_date" type="date" class="form-control" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success w-100" [disabled]="!addEventForm.valid">
+              Save Event
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 </div>

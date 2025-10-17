@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+
 
 export interface Employee {
   id: number;
@@ -13,9 +16,10 @@ export interface Employee {
 
 export interface Team {
   id?: number;
-  name: string;       // backend name
+  name: string;       
   status: string;
   members: Employee[];
+  
 }
 
 @Injectable({
@@ -36,30 +40,46 @@ export class TeamService {
     return this.http.put(`${this.baseUrl}/employees/${empId}/status`, { status });
   }
 
-  // Teams
-  getTeams(): Observable<Team[]> {
-    return this.http.get<Team[]>(`${this.baseUrl}/teams`);
-  }
+// Teams
+getTeams(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/teams`);
+  }  
+  
+getAllTeams(): Observable<Team[]> {
+  return this.http.get<Team[]>(`${this.baseUrl}/teams`);
+}
+  
 
-  addTeam(name: string, memberIds: number[], status: string = 'Active'): Observable<any> {
-    return this.http.post(`${this.baseUrl}/teams`, { name, memberIds, status });
-  }
+addTeam(employeeId: number, teamName: string) {
+  const url = `http://localhost:3000/api/employees/${employeeId}/team`;
+  const body = { teamName };
+  console.log('PUT body:', body);  // 🔹 Debugging log
+  return this.http.put(url, body);
+}
 
-// team.service.ts
+updateEmployeeTeam(empId: number, teamName: string): Observable<any> {
+  console.log('PUT body:', { teamName }); // Debug log
+  return this.http.put(`${this.baseUrl}/api/employees/${empId}/team`, { teamName });
+}
+
 // team.service.ts
 updateTeamStatus(teamId: number, status: string) {
   return this.http.put(`${this.baseUrl}/teams/${teamId}/status`, { status });
 }
-deleteTeam(teamId: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}/teams/${teamId}`);
-}
-updateTeam(team: { id: number; name: string; members: any[] }) {
-  const memberIds = team.members.map(m => m.id); // send only employee IDs
-  return this.http.put(`http://localhost:3000/teams/${team.id}`, {
-    name: team.name,
-    members: memberIds
-  });
+
+deleteTeam(id: number) {
+  return this.http.delete(`http://localhost:3000/teams/${id}`);
 }
 
-  
+
+updateTeam(teamId: number, payload: any) {
+  return this.http.put(`http://localhost:3000/teams/${teamId}`, payload);
+}
+
+
+// team.service.ts
+getEmployeeTeams(employeeId: number): Observable<Team[]> {
+  return this.http.get<Team[]>(`${this.baseUrl}/api/employees/${employeeId}/teams`);
+}
+
 }

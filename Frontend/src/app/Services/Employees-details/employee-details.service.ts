@@ -9,7 +9,7 @@ import { EmployeeDocument } from '../../models/employee-details.model';
 export class EmployeeDetailsService {
   private baseUrl = 'http://localhost:3000/api/employees';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // Get employee documents
   getEmployeeDocuments(employeeId: number): Observable<EmployeeDocument[]> {
@@ -34,4 +34,10 @@ export class EmployeeDetailsService {
   updateEmployeeContact(employeeId: number, data: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/${employeeId}/contact`, data);
   }
+
+  // EmployeeDetailsService
+getAllDocuments(): Observable<EmployeeDocument[]> {
+  return this.http.get<EmployeeDocument[]>('http://localhost:3000/employees/documents');
+}
+
 }
